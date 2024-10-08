@@ -49,33 +49,6 @@ TRAEFIK_HOST=<DNS_NAME>
 TRAEFIK_SSL_EMAIL=<EMAIL>
 ```
 
-## Additional Configuration Variables
-
-These variables can be configured directly in the `docker-compose.yaml` file.
-
-### Cloud variables
-
-Each cloud provider has own cloud variables (OCI, AWS, LINODE)
-
-Example for OCI:
-
-```yaml
-TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..
-TF_VAR_oci_user_ocid: ocid1.user.oc1..
-TF_VAR_oci_compartment_id: ocid1.compartment.oc1..
-TF_VAR_oci_fingerprint: 00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
-TF_VAR_oci_private_key_path: /home/ubuntu/.ssh/oracle_private_api_key.pem
-TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pub
-```
-
-### Red5 Pro variables
-
-Example:
-
-```yaml
-TF_VAR_r5p_license_key: 1111-2222-3333-4444
-```
-
 ## Cloud variables for as-terraform service
 
 Each cloud provider has own cloud variables (OCI, AWS, LINODE)  
@@ -135,6 +108,8 @@ Example `as-terraform` service configuration for OCI
       - ./keys/red5pro_ssh_public_key.pub:/home/ubuntu/.ssh/red5pro_ssh_public_key.pub
 ```
 
+---
+
 ### AWS specific variables
 
 ```yaml
@@ -179,6 +154,8 @@ Example `as-terraform` service configuration for AWS
       TF_VAR_r5p_license_key: 1111-2222-3333-4444
 ```
 
+---
+
 ### Linode specific variables
 
 ```yaml
@@ -219,6 +196,8 @@ Example `as-terraform` service configuration for AWS
       TF_VAR_linode_ssh_key_name: REPLACE_LINODE_SSH_KEY_NAME
       TF_VAR_r5p_license_key: 1111-2222-3333-4444
 ```
+
+---
 
 ## Red5 Pro variables for as-terraform service
 

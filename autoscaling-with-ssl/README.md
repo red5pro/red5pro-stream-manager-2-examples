@@ -96,6 +96,8 @@ Example `as-terraform` service configuration for OCI
       - ./keys/red5pro_ssh_public_key.pub:/home/ubuntu/.ssh/red5pro_ssh_public_key.pub
 ```
 
+---
+
 ### AWS specific variables
 
 ```yaml
@@ -140,6 +142,8 @@ Example `as-terraform` service configuration for AWS
       TF_VAR_r5p_license_key: 1111-2222-3333-4444
 ```
 
+---
+
 ### Linode specific variables
 
 ```yaml
@@ -180,6 +184,8 @@ Example `as-terraform` service configuration for AWS
       TF_VAR_linode_ssh_key_name: REPLACE_LINODE_SSH_KEY_NAME
       TF_VAR_r5p_license_key: 1111-2222-3333-4444
 ```
+
+---
 
 ## Red5 Pro variables for as-terraform service
 

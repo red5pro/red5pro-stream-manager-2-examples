@@ -155,7 +155,7 @@ TF_VAR_linode_ssh_key_name: REPLACE_LINODE_SSH_KEY_NAME
 * `TF_VAR_linode_ssh_key_name` - SSH key name. It will be using for SSH connect to Red5 Pro nodes. Follow the [docs](https://techdocs.akamai.com/cloud-computing/docs/manage-ssh-keys) to create SSH key pair in Linode.
 
 ---
-Example `as-terraform` service configuration for AWS
+Example `as-terraform` service configuration for Linode
 
 ```yaml
   as-terraform:

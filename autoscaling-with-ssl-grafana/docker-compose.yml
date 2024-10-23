@@ -5,6 +5,7 @@ name: autoscaling
 services:
   kafka0:
     image: confluentinc/cp-kafka:latest
+    restart: unless-stopped
     hostname: kafka0
     container_name: kafka0
     ports:
@@ -42,6 +43,7 @@ services:
 
   as-admin:
     image: red5pro/as-admin:latest
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/admin/healthz"]
       start_period: 10s
@@ -87,14 +89,13 @@ services:
       traefik.http.routers.admin-springdoc.entrypoints: "websecure"
       traefik.http.routers.admin-springdoc.middlewares: "strip-swagger-admin@docker"
       traefik.http.middlewares.strip-swagger-admin.stripprefix.prefixes: "/as/v1/admin"
-      traefik.http.middlewares.strip-swagger-admin.stripprefix.forceSlash: "false"
       traefik.http.routers.as-admin.rule: "PathPrefix(`/as/v1/admin`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
       traefik.http.routers.as-admin.entrypoints: "websecure"
       traefik.http.routers.as-admin.middlewares: "strip-admin@docker"
       traefik.http.middlewares.strip-admin.stripprefix.prefixes: "/as/v1/"
-      traefik.http.middlewares.strip-admin.stripprefix.forceSlash: "false"
 
   as-terraform:
+    restart: unless-stopped
     deploy:
       replicas: 1
     image: red5pro/as-terraform:latest
@@ -113,13 +114,13 @@ services:
       R5AS_SASL_PASSWORD: ""
       R5AS_SASL_ENABLED_MECHANISMS: ""
       R5AS_COMMAND_INACTIVITY_GAP_MS: 10000
-      TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..aaaaaaaas7veavcqejqoeshe6ivphxpslimnlxqa5uvcr7kjvgpeqo2tqgsq
-      TF_VAR_oci_user_ocid: ocid1.user.oc1..aaaaaaaabwkr4lwis6ni26wn4fijmjjhbol6r3ebu2vkiu5cvxjmp2rfmk6q
-      TF_VAR_oci_compartment_id: ocid1.compartment.oc1..aaaaaaaafasbmuztg2fuetes66exq4gwq2svqptmepsfwsw53f2zd7ts4kiq
-      TF_VAR_oci_fingerprint: 27:91:7c:99:d5:ca:3a:46:60:11:19:82:15:18:a6:eb
+      TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..
+      TF_VAR_oci_user_ocid: ocid1.user.oc1..
+      TF_VAR_oci_compartment_id: ocid1.compartment.oc1..
+      TF_VAR_oci_fingerprint: 00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
       TF_VAR_oci_private_key_path: /home/ubuntu/.ssh/oracle_private_api_key.pem
       TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pub
-      TF_VAR_r5p_license_key: QGZG-2OLJ-7QPE-ELBW
+      TF_VAR_r5p_license_key: 1111-2222-3333-4444
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./keys/oracle_private_api_key.pem:/home/ubuntu/.ssh/oracle_private_api_key.pem
@@ -127,6 +128,7 @@ services:
 
   as-proxy:
     image: red5pro/as-proxy:latest
+    restart: unless-stopped
     depends_on:
       kafka0:
         condition: service_healthy
@@ -140,9 +142,9 @@ services:
       - "traefik.http.routers.asproxy.entrypoints=websecure"
       - "traefik.http.routers.asproxy.middlewares=strip-asproxy@docker"
       - "traefik.http.middlewares.strip-asproxy.stripprefix.prefixes=/as/v1/proxy"
-      - "traefik.http.middlewares.strip-asproxy.stripprefix.forceSlash=false"
 
   as-autoscale-service:
+    restart: unless-stopped
     deploy:
       replicas: 1
     image: red5pro/as-autoscale-service:latest
@@ -188,15 +190,14 @@ services:
       - "traefik.http.routers.autoscale-springdoc.entrypoints=websecure"
       - "traefik.http.routers.autoscale-springdoc.middlewares=strip-autoscale@docker"
       - "traefik.http.middlewares.strip-autoscale.stripprefix.prefixes=/as/v1/autoscale"
-      - "traefik.http.middlewares.strip-autoscale.stripprefix.forceSlash=false"
       - "traefik.http.routers.autoscale.rule=PathPrefix(`/as/v1/autoscale`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
       - "traefik.http.routers.autoscale.entrypoints=websecure"
       - "traefik.http.routers.autoscale.middlewares=strip-m-autoscale@docker"
       - "traefik.http.middlewares.strip-m-autoscale.stripprefix.prefixes=/as/v1"
-      - "traefik.http.middlewares.strip-m-autoscale.stripprefix.forceSlash=false"
 
   as-auth:
     image: red5pro/as-auth:latest
+    restart: unless-stopped
     ports:
       - 10080:8080
     environment:
@@ -210,10 +211,10 @@ services:
       - "traefik.http.routers.asauth.entrypoints=websecure"
       - "traefik.http.routers.asauth.middlewares=strip-asauth@docker"     
       - "traefik.http.middlewares.strip-asauth.stripprefix.prefixes=/as/v1"
-      - "traefik.http.middlewares.strip-asauth.stripprefix.forceSlash=false"
 
   as-streams:
     image: red5pro/as-streams:latest
+    restart: unless-stopped
     deploy:
       replicas: 1
     depends_on:
@@ -247,16 +248,18 @@ services:
       - "traefik.http.routers.asstreams.entrypoints=websecure"
       - "traefik.http.routers.asstreams.middlewares=strip-asstreams@docker"
       - "traefik.http.middlewares.strip-asstreams.stripprefix.prefixes=/as/v1"
-      - "traefik.http.middlewares.strip-asstreams.stripprefix.forceSlash=false"
 
   reverse-proxy:
     image: traefik
+    restart: unless-stopped
     command: 
+      # --log.level=DEBUG
       --api.insecure=true
       --api.dashboard=true
       --providers.docker=true
       --providers.docker.exposedbydefault=false
       --entrypoints.websecure.address=:443
+      --entrypoints.websecure.http.tls=true
       --entrypoints.websecure.http.tls.domains[0].main=${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}
       --certificatesresolvers.myresolver.acme.tlschallenge=true
       --certificatesresolvers.myresolver.acme.email=${TRAEFIK_SSL_EMAIL:?Ensure TRAEFIK_SSL_EMAIL is set. It needs to get SSL certificate.}
@@ -264,13 +267,13 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
     volumes:
       - "./letsencrypt:/letsencrypt"
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik-ui.entrypoints=websecure"
+      - "traefik.http.routers.traefik-ui.tls.certresolver=myresolver"
       - "traefik.http.routers.traefik-ui.rule=(PathPrefix(`/dashboard`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)) || (PathPrefix(`/api`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`))"
       - "traefik.http.services.traefik-ui.loadbalancer.server.port=8080"
 
@@ -305,6 +308,7 @@ services:
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
+    restart: unless-stopped
     ports:
       - 8090:8080
     depends_on:
@@ -327,9 +331,11 @@ services:
 
   as-debug-ui:
     image: "red5pro/as-debug-ui:latest"
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.caddy.entrypoints=websecure"
+      - "traefik.http.routers.caddy.tls.certresolver=myresolver"
       - "traefik.http.routers.caddy.rule=PathPrefix(`/`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
 
 #################################################

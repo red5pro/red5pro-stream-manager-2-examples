@@ -47,7 +47,16 @@ R5AS_AUTH_PASS=<PASSWORD>
 KAFKA_HOST=<PRIVATE_IP>
 TRAEFIK_HOST=<DNS_NAME>
 TRAEFIK_SSL_EMAIL=<EMAIL>
+R5P_LICENSE_KEY=<LICENSE_KEY>
 ```
+
+* `R5AS_AUTH_SECRET` - Authentication secret used to create and authenticate JWTs. Example: `12345abcd`
+* `R5AS_AUTH_USER` - Authentication user name used to get JWT token. Example: `admin`
+* `R5AS_AUTH_PASS` - Authentication user password used to get JWT token. Example: `password`
+* `KAFKA_HOST` - Kafka server IP address. In this deployment Kafka server on the Stream Manager 2.0 instance so you will need to set Private IP address of this instance. Example: `10.0.0.10`
+* `TRAEFIK_HOST` - Stream Manager 2.0 domain name: This should be the same domain name you used to create the DNS record. Example: `red5pro-sm2.example.com`
+* `TRAEFIK_SSL_EMAIL` - The email address that will be used for the SSL certificate.
+* `R5P_LICENSE_KEY` - Red5 Pro license key which will be using on the Red5 Pro nodes. It should be active [Red5 Pro license key](https://account.red5.net/overview), Startup Pro level or higher.
 
 ## Cloud variables for as-terraform service
 
@@ -57,9 +66,9 @@ These variables can be configured directly in the `docker-compose.yaml` file.
 ### OCI specific variables
 
 ```yaml
-TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..
-TF_VAR_oci_compartment_id: ocid1.compartment.oc1..
-TF_VAR_oci_user_ocid: ocid1.user.oc1..
+TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+TF_VAR_oci_user_ocid: ocid1.user.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+TF_VAR_oci_compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
 TF_VAR_oci_fingerprint: 00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
 TF_VAR_oci_private_key_path: /home/ubuntu/.ssh/oracle_private_api_key.pem
 TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pub
@@ -95,13 +104,13 @@ Example `as-terraform` service configuration for OCI
       R5AS_SASL_PASSWORD: ""
       R5AS_SASL_ENABLED_MECHANISMS: ""
       R5AS_COMMAND_INACTIVITY_GAP_MS: 10000
-      TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..
-      TF_VAR_oci_user_ocid: ocid1.user.oc1..
-      TF_VAR_oci_compartment_id: ocid1.compartment.oc1..
+      TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+      TF_VAR_oci_user_ocid: ocid1.user.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+      TF_VAR_oci_compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
       TF_VAR_oci_fingerprint: 00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
       TF_VAR_oci_private_key_path: /home/ubuntu/.ssh/oracle_private_api_key.pem
       TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pub
-      TF_VAR_r5p_license_key: 1111-2222-3333-4444
+      TF_VAR_r5p_license_key: ${R5P_LICENSE_KEY:?R5P_LICENSE_KEY is not set}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./keys/oracle_private_api_key.pem:/home/ubuntu/.ssh/oracle_private_api_key.pem
@@ -151,7 +160,7 @@ Example `as-terraform` service configuration for AWS
       TF_VAR_aws_secret_key: REPLACE_AWS_SECRET_KEY
       TF_VAR_aws_ssh_key_pair: REPLACE_AWS_SSH_KEY_NAME
       TF_VAR_enable_root_volume_block_encryption: true
-      TF_VAR_r5p_license_key: 1111-2222-3333-4444
+      TF_VAR_r5p_license_key: ${R5P_LICENSE_KEY:?R5P_LICENSE_KEY is not set}
 ```
 
 ---
@@ -194,17 +203,5 @@ Example `as-terraform` service configuration for Linode
       TF_VAR_linode_api_token: REPLACE_LINODE_API_TOKEN
       TF_VAR_linode_root_user_password: REPLACE_LINODE_SECRET_KEY
       TF_VAR_linode_ssh_key_name: REPLACE_LINODE_SSH_KEY_NAME
-      TF_VAR_r5p_license_key: 1111-2222-3333-4444
+      TF_VAR_r5p_license_key: ${R5P_LICENSE_KEY:?R5P_LICENSE_KEY is not set}
 ```
-
----
-
-## Red5 Pro variables for as-terraform service
-
-```yaml
-TF_VAR_r5p_license_key: 1111-2222-3333-4444
-```
-
-* `TF_VAR_r5p_license_key` - Red5 Pro license key which will be using on the Red5 Pro nodes. It should be active [Red5 Pro license key](https://account.red5.net/overview), Startup Pro level or higher.
-
-> **Note:** clustering and autoscaling are not supported by `TRIAL` or `DEVELOPER` license type.

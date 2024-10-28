@@ -119,7 +119,7 @@ services:
       TF_VAR_oci_fingerprint: 00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
       TF_VAR_oci_private_key_path: /home/ubuntu/.ssh/oracle_private_api_key.pem
       TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pub
-      TF_VAR_r5p_license_key: 1111-2222-3333-4444
+      TF_VAR_r5p_license_key: ${R5P_LICENSE_KEY:?R5P_LICENSE_KEY is not set}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./keys/oracle_private_api_key.pem:/home/ubuntu/.ssh/oracle_private_api_key.pem

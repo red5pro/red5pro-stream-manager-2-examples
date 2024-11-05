@@ -44,6 +44,7 @@ This will ensure that Docker Compose can read the environment variables correctl
 R5AS_AUTH_SECRET=<SECRET_KEY>
 R5AS_AUTH_USER=<USER_NAME>
 R5AS_AUTH_PASS=<PASSWORD>
+R5AS_CLOUD_PLATFORM_TYPE=<PLATFORM_TYPE>
 KAFKA_HOST=<PRIVATE_IP>
 TRAEFIK_HOST=<DNS_NAME>
 TRAEFIK_SSL_EMAIL=<EMAIL>
@@ -53,6 +54,7 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 * `R5AS_AUTH_SECRET` - Authentication secret used to create and authenticate JWTs. Example: `12345abcd`
 * `R5AS_AUTH_USER` - Authentication user name used to get JWT token. Example: `admin`
 * `R5AS_AUTH_PASS` - Authentication user password used to get JWT token. Example: `password`
+* `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (OCI,AWS,LINODE). Example: `OCI`
 * `KAFKA_HOST` - Kafka server IP address. In this deployment Kafka server on the Stream Manager 2.0 instance so you will need to set Private IP address of this instance. Example: `10.0.0.10`
 * `TRAEFIK_HOST` - Stream Manager 2.0 domain name: This should be the same domain name you used to create the DNS record. Example: `red5pro-sm2.example.com`
 * `TRAEFIK_SSL_EMAIL` - The email address that will be used for the SSL certificate.

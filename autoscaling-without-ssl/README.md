@@ -32,6 +32,7 @@ This will ensure that Docker Compose can read the environment variables correctl
 R5AS_AUTH_SECRET=<SECRET_KEY>
 R5AS_AUTH_USER=<USER_NAME>
 R5AS_AUTH_PASS=<PASSWORD>
+R5AS_CLOUD_PLATFORM_TYPE=<PLATFORM_TYPE>
 KAFKA_HOST=<PRIVATE_IP>
 R5P_LICENSE_KEY=<LICENSE_KEY>
 ```
@@ -39,6 +40,7 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 * `R5AS_AUTH_SECRET` - Authentication secret used to create and authenticate JWTs. Example: `12345abcd`
 * `R5AS_AUTH_USER` - Authentication user name used to get JWT token. Example: `admin`
 * `R5AS_AUTH_PASS` - Authentication user password used to get JWT token. Example: `password`
+* `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (OCI,AWS,LINODE). Example: `OCI`
 * `KAFKA_HOST` - Kafka server IP address. In this deployment Kafka server on the Stream Manager 2.0 instance so you will need to set Private IP address of this instance. Example: `10.0.0.10`
 * `R5P_LICENSE_KEY` - Red5 Pro license key which will be using on the Red5 Pro nodes. It should be active [Red5 Pro license key](https://account.red5.net/overview), Startup Pro level or higher.
 

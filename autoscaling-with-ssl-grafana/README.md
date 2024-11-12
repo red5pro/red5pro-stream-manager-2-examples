@@ -54,7 +54,7 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 * `R5AS_AUTH_SECRET` - Authentication secret used to create and authenticate JWTs. Example: `12345abcd`
 * `R5AS_AUTH_USER` - Authentication user name used to get JWT token. Example: `admin`
 * `R5AS_AUTH_PASS` - Authentication user password used to get JWT token. Example: `password`
-* `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (OCI,AWS,LINODE). Example: `OCI`
+* `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (GCP,OCI,AWS,LINODE). Example: `GCP`
 * `KAFKA_HOST` - Kafka server IP address. In this deployment Kafka server on the Stream Manager 2.0 instance so you will need to set Private IP address of this instance. Example: `10.0.0.10`
 * `TRAEFIK_HOST` - Stream Manager 2.0 domain name: This should be the same domain name you used to create the DNS record. Example: `red5pro-sm2.example.com`
 * `TRAEFIK_SSL_EMAIL` - The email address that will be used for the SSL certificate.
@@ -62,8 +62,45 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 
 ## Cloud variables for as-terraform service
 
-Each cloud provider has own cloud variables (OCI, AWS, LINODE)  
+Each cloud provider has own cloud variables (GCP, OCI, AWS, LINODE)  
 These variables can be configured directly in the `docker-compose.yaml` file.
+
+### GCP specific variables
+
+```yaml
+TF_VAR_project_id: "example-testing"
+```
+* `TF_VAR_project_id` - Google Cloud Project ID.Follow the [docs](https://support.google.com/googleapi/answer/7014113?hl=en) to create
+---
+Example `as-terraform` service configuration for GCP
+
+```yaml
+  as-terraform:
+    deploy:
+      replicas: 1
+    image: red5pro/as-terraform:latest
+    depends_on:
+      kafka0:
+        condition: service_healthy
+    environment:
+      R5AS_AUTOSCALE_PARTITIONS: 2
+      R5AS_REPLICATION_FACTOR: 1
+      R5AS_BOOTSTRAP_SERVERS: kafka0:29092
+      R5AS_SECURITY_PROTOCOL_CONFIG: ""
+      R5AS_SSL_KEYSTORE_TYPE_CONFIG: ""
+      R5AS_SSL_TRUSTSTORE_TYPE_CONFIG: ""
+      R5AS_SSL_CA_CERTIFICATE: ""
+      R5AS_SASL_USERNAME: ""
+      R5AS_SASL_PASSWORD: ""
+      R5AS_SASL_ENABLED_MECHANISMS: ""
+      R5AS_COMMAND_INACTIVITY_GAP_MS: 10000
+      TF_VAR_project_id: "example-testing"
+      TF_VAR_r5p_license_key: ${R5P_LICENSE_KEY:?R5P_LICENSE_KEY is not set}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+```
+---
 
 ### OCI specific variables
 

@@ -42,7 +42,7 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 * `R5AS_AUTH_SECRET` - Authentication secret used to create and authenticate JWTs. Example: `12345abcd`
 * `R5AS_AUTH_USER` - Authentication user name used to get JWT token. Example: `admin`
 * `R5AS_AUTH_PASS` - Authentication user password used to get JWT token. Example: `password`
-* `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (OCI,AWS,LINODE). Example: `OCI`
+* `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (GCP,OCI,AWS,LINODE). Example: `GCP`
 * `KAFKA_HOST` - Kafka server IP address. In this deployment Kafka server on the Stream Manager 2.0 instance so you will need to set Private IP address of this instance. Example: `10.0.0.10`
 * `TRAEFIK_HOST` - Stream Manager 2.0 domain name: This should be the same domain name you used to create the DNS record. Example: `red5pro-sm2.example.com`
 * `TRAEFIK_SSL_EMAIL` - The email address that will be used for the SSL certificate.
@@ -50,8 +50,47 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 
 ## Cloud variables for as-terraform service
 
-Each cloud provider has own cloud variables (OCI, AWS, LINODE)  
+Each cloud provider has own cloud variables (GCP, OCI, AWS, LINODE)  
 These variables can be configured directly in the `docker-compose.yaml` file.
+
+### GCP specific variables
+
+```yaml
+TF_VAR_project_id: "example-testing" 
+```
+
+* `TF_VAR_project_id` - Google Cloud Project ID.Follow the [docs](https://support.google.com/googleapi/answer/7014113?hl=en) to create
+
+---
+Example `as-terraform` service configuration for GCP
+
+```yaml
+  as-terraform:
+    deploy:
+      replicas: 1
+    image: red5pro/as-terraform:latest
+    depends_on:
+      kafka0:
+        condition: service_healthy
+    environment:
+      R5AS_AUTOSCALE_PARTITIONS: 2
+      R5AS_REPLICATION_FACTOR: 1
+      R5AS_BOOTSTRAP_SERVERS: kafka0:29092
+      R5AS_SECURITY_PROTOCOL_CONFIG: ""
+      R5AS_SSL_KEYSTORE_TYPE_CONFIG: ""
+      R5AS_SSL_TRUSTSTORE_TYPE_CONFIG: ""
+      R5AS_SSL_CA_CERTIFICATE: ""
+      R5AS_SASL_USERNAME: ""
+      R5AS_SASL_PASSWORD: ""
+      R5AS_SASL_ENABLED_MECHANISMS: ""
+      R5AS_COMMAND_INACTIVITY_GAP_MS: 10000
+      TF_VAR_project_id: "example-testing"
+      TF_VAR_r5p_license_key: ${R5P_LICENSE_KEY:?R5P_LICENSE_KEY is not set}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      
+```
+---
 
 ### OCI specific variables
 
@@ -64,13 +103,12 @@ TF_VAR_oci_private_key_path: /home/ubuntu/.ssh/oracle_private_api_key.pem
 TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pub
 ```
 
-* `TF_VAR_oci_tenancy_ocid` -  Oracle cloud tenancy OCID. Follow the [docs](https://docs.oracle.com/en-us/iaas/Content/Identity/tenancy/managingtenancy.htm) to get tenancy OCID
+* `TF_VAR_oci_tenancy_ocid` - Oracle cloud tenancy OCID. Follow the [docs](https://docs.oracle.com/en-us/iaas/Content/Identity/tenancy/managingtenancy.htm) to get tenancy OCID
 * `TF_VAR_oci_compartment_id` - Oracle cloud compartment OCID. Follow the [docs](https://docs.oracle.com/en-us/iaas/Content/GSG/Tasks/contactingsupport_topic-Locating_Oracle_Cloud_Infrastructure_IDs.htm#Finding_the_OCID_of_a_Compartment) to get compartment OCID
-* `TF_VAR_oci_user_ocid` - Oracle cloud user OCID. You can get user OCID details in the Profile &rarr; User information
+* `TF_VAR_oci_user_ocid` - Oracle cloud user OCID. You can get user OCID details in the Profile → User information
 * `TF_VAR_oci_fingerprint` - Fingerprint of Oracle cloud API ssh key. Follow the [docs](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm#two) to get Fingerprint
 * `TF_VAR_oci_private_key_path` - Provide path to the private Oracle cloud API SSH key. Follow the [docs](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm#two) to generate new API SSH key. It should be uploaded to the Stream Manager 2.0 instance and mounted in the docker-compose.yaml file.
-* `TF_VAR_oci_node_ssh_public_key_path` - Provide path to the public SSH key. It will be using for SSH connect to Red5 Pro nodes. You can generate SSH key par using `ssh-keygen` in Linux or MacOS command line. Or you can use the same `*.pub` key which you used to deploy Stream Manager 2.0 instance. It should be uploaded to the Stream Manager 2.0 instance and mounted in the docker-compose.yaml file.
-
+TF_VAR_oci_node_ssh_public_key_path - Provide path to the public SSH key. It will be using for SSH connect to Red5 Pro nodes. You can generate SSH key par using `ssh-keygen` in Linux or MacOS command line. Or you can use the same `*.pub` key which you used to deploy Stream Manager 2.0 instance. It should be uploaded to the Stream Manager 2.0 instance and mounted in the docker-compose.yaml file.  
 ---
 Example `as-terraform` service configuration for OCI
 

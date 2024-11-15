@@ -71,8 +71,6 @@ TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pu
 * `TF_VAR_oci_private_key_path` - Provide path to the private Oracle cloud API SSH key. Follow the [docs](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm#two) to generate new API SSH key. It should be uploaded to the Stream Manager 2.0 instance and mounted in the docker-compose.yml file.
 TF_VAR_oci_node_ssh_public_key_path - Provide path to the public SSH key. It will be using for SSH connect to Red5 Pro nodes. You can generate SSH key par using `ssh-keygen` in Linux or MacOS command line. Or you can use the same `*.pub` key which you used to deploy Stream Manager 2.0 instance. It should be uploaded to the Stream Manager 2.0 instance and mounted in the docker-compose.yml file.  
 
----
-
 Example `as-terraform` service configuration for OCI
 
 ```yaml
@@ -122,7 +120,6 @@ TF_VAR_enable_root_volume_block_encryption: true
 * `TF_VAR_aws_ssh_key_pair` - SSH key name. It will be using for SSH connect to Red5 Pro nodes. Follow the [docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html) to create SSH key pair in AWS.
 * `TF_VAR_enable_root_volume_block_encryption` - Enable or disable root block volume encryption for node instance. Defaults to true.
 
----
 Example `as-terraform` service configuration for AWS
 
 ```yaml
@@ -164,7 +161,6 @@ TF_VAR_linode_ssh_key_name: REPLACE_LINODE_SSH_KEY_NAME
 * `TF_VAR_linode_root_user_password` - Provide the root user password for Red5 Pro nodes. Root user password must lies between 11-64 character.
 * `TF_VAR_linode_ssh_key_name` - SSH key name. It will be using for SSH connect to Red5 Pro nodes. Follow the [docs](https://techdocs.akamai.com/cloud-computing/docs/manage-ssh-keys) to create SSH key pair in Linode.
 
----
 Example `as-terraform` service configuration for Linode
 
 ```yaml
@@ -200,8 +196,6 @@ TF_VAR_project_id: "example-testing"
 ```
 
 * `TF_VAR_project_id` - Google Cloud Project ID. Follow the [docs](https://support.google.com/googleapi/answer/7014113?hl=en) to create
-
----
 
 Example `as-terraform` service configuration for GCP
 

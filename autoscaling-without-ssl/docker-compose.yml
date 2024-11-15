@@ -113,9 +113,9 @@ services:
       R5AS_SASL_PASSWORD: ""
       R5AS_SASL_ENABLED_MECHANISMS: ""
       R5AS_COMMAND_INACTIVITY_GAP_MS: 10000
-      TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..
-      TF_VAR_oci_user_ocid: ocid1.user.oc1..
-      TF_VAR_oci_compartment_id: ocid1.compartment.oc1..
+      TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+      TF_VAR_oci_user_ocid: ocid1.user.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+      TF_VAR_oci_compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
       TF_VAR_oci_fingerprint: 00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
       TF_VAR_oci_private_key_path: /home/ubuntu/.ssh/oracle_private_api_key.pem
       TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pub
@@ -124,6 +124,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./keys/oracle_private_api_key.pem:/home/ubuntu/.ssh/oracle_private_api_key.pem
       - ./keys/red5pro_ssh_public_key.pub:/home/ubuntu/.ssh/red5pro_ssh_public_key.pub
+    
 
   as-proxy:
     image: red5pro/as-proxy:latest

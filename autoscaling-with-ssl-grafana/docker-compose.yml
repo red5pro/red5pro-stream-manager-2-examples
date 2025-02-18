@@ -11705,7 +11705,7 @@ configs:
                         "type": "prometheus",
                         "uid": "$${datasource}"
                       },
-                      "expr": "irate(node_vmstat_pgfault{instance=\"$$node\",job=\"$$job\"}[$$__rate_interval])  - irate(node_vmstat_pgmajfault{instance=\"$$node\",job=\"$$job\"}[$__rate_interval])",
+                      "expr": "irate(node_vmstat_pgfault{instance=\"$$node\",job=\"$$job\"}[$$__rate_interval])  - irate(node_vmstat_pgmajfault{instance=\"$$node\",job=\"$$job\"}[$$__rate_interval])",
                       "format": "time_series",
                       "intervalFactor": 1,
                       "legendFormat": "Pgminfault - Minor page fault operations",
@@ -23866,7 +23866,7 @@ configs:
                 {
                   "datasource": {
                     "type": "prometheus",
-                    "uid": "${datasource}"
+                    "uid": "$${datasource}"
                   },
                   "description": "Enable with --collector.tcpstat argument on node-exporter",
                   "fieldConfig": {
@@ -23949,7 +23949,7 @@ configs:
                     {
                       "datasource": {
                         "type": "prometheus",
-                        "uid": "${datasource}"
+                        "uid": "$${datasource}"
                       },
                       "editorMode": "code",
                       "expr": "node_tcp_connection_states{state=\"established\",instance=\"$$node\",job=\"$$job\"}",
@@ -26755,7 +26755,7 @@ configs:
                   "type": "prometheus",
                   "uid": "victoria-metrics"
                 },
-                "expr": "sum by(topic) (kafka_topic_partitions{instance=\"$$instance\",topic=~\"$topic\"})",
+                "expr": "sum by(topic) (kafka_topic_partitions{instance=\"$$instance\",topic=~\"$$topic\"})",
                 "format": "time_series",
                 "intervalFactor": 1,
                 "legendFormat": "{{topic}}",

@@ -78,12 +78,12 @@ KAFKA_HOST=<PRIVATE_IP>
 TRAEFIK_HOST=<DNS_NAME>
 TRAEFIK_SSL_EMAIL=<EMAIL>
 R5P_LICENSE_KEY=<LICENSE_KEY>
-OCI_TENANCY_OCID=<OCI_TENANCY_OCID>
-OCI_USER_OCID=<OCI_USER_OCID>
-OCI_COMPARTMENT_ID=<OCI_COMPARTMENT_ID>
-OCI_FINGERPRINT=<OCI_FINGERPRINT>
-OCI_PRIVATE_KEY_PATH=<OCI_PRIVATE_KEY_PATH>
-OCI_NODE_SSH_PUBLIC_KEY_PATH=<OCI_NODE_SSH_PUBLIC_KEY_PATH>
+OCI_TENANCY_OCID=ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+OCI_USER_OCID=ocid1.user.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+OCI_COMPARTMENT_ID=ocid1.compartment.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+OCI_FINGERPRINT=00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
+OCI_PRIVATE_KEY_PATH=/home/ubuntu/.ssh/oracle_private_api_key.pem
+OCI_NODE_SSH_PUBLIC_KEY_PATH=/home/ubuntu/.ssh/red5pro_ssh_public_key.pub
 ```
 
 ### AWS specific variables

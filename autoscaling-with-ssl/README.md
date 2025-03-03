@@ -56,12 +56,12 @@ These variables can be configured in the `.env` file.
 ### OCI specific variables
 
 ```yaml
-OCI_TENANCY_OCID= TENANCY_OCID
-OCI_USER_OCID= USER_OCID
-OCI_COMPARTMENT_ID= COMPARTMENT_ID
-OCI_FINGERPRINT= OCI_FINGERPRINT
-OCI_PRIVATE_KEY_PATH= OCI_PRIVATE_KEY_PATH
-OCI_NODE_SSH_PUBLIC_KEY_PATH= NODE_SSH_PUBLIC_KEY_PATH
+OCI_TENANCY_OCID=ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+OCI_USER_OCID=ocid1.user.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+OCI_COMPARTMENT_ID=ocid1.compartment.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
+OCI_FINGERPRINT=00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
+OCI_PRIVATE_KEY_PATH=/home/ubuntu/.ssh/oracle_private_api_key.pem
+OCI_NODE_SSH_PUBLIC_KEY_PATH=/home/ubuntu/.ssh/red5pro_ssh_public_key.pub
 ```
 
 * `OCI_TENANCY_OCID` - Oracle cloud tenancy OCID. Follow the [docs](https://docs.oracle.com/en-us/iaas/Content/Identity/tenancy/managingtenancy.htm) to get tenancy OCID
@@ -93,10 +93,10 @@ OCI_NODE_SSH_PUBLIC_KEY_PATH=<OCI_NODE_SSH_PUBLIC_KEY_PATH>
 ### AWS specific variables
 
 ```yaml
-AWS_ACCESS_KEY= REPLACE_AWS_ACCESS_KEY
-AWS_SECRET_KEY= REPLACE_AWS_SECRET_KEY
-AWS_SSH_KEY_PAIR= REPLACE_AWS_SSH_KEY_NAME
-AWS_ENABLE_ROOT_VOLUME_BLOCK_ENCRYPTION= true
+AWS_ACCESS_KEY=REPLACE_AWS_ACCESS_KEY
+AWS_SECRET_KEY=REPLACE_AWS_SECRET_KEY
+AWS_SSH_KEY_PAIR=REPLACE_AWS_SSH_KEY_NAME
+AWS_ENABLE_ROOT_VOLUME_BLOCK_ENCRYPTION=true
 ```
 
 * `AWS_ACCESS_KEY` - AWS access key to authenticate with AWS account. Follow the [docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) to create
@@ -118,14 +118,14 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 AWS_ACCESS_KEY=<REPLACE_AWS_ACCESS_KEY>
 AWS_SECRET_KEY=<REPLACE_AWS_SECRET_KEY>
 AWS_SSH_KEY_PAIR=<REPLACE_AWS_SSH_KEY_NAME>
-AWS_ENABLE_ROOT_VOLUME_BLOCK_ENCRYPTION= true
+AWS_ENABLE_ROOT_VOLUME_BLOCK_ENCRYPTION=true
 ```
 
 ### Linode specific variables
 
 ```yaml
-LINODE_API_TOKEN= REPLACE_LINODE_API_TOKEN
-LINODE_SSH_KEY_NAME= REPLACE_LINODE_SSH_KEY_NAME
+LINODE_API_TOKEN=REPLACE_LINODE_API_TOKEN
+LINODE_SSH_KEY_NAME=REPLACE_LINODE_SSH_KEY_NAME
 ```
 
 * `LINODE_API_TOKEN` - Linode API token to authenticate with cloud. Follow the [docs](https://cloud.linode.com/profile/tokens) to create
@@ -149,7 +149,7 @@ LINODE_SSH_KEY_NAME=<REPLACE_LINODE_SSH_KEY_NAME>
 ### GCP specific variables
 
 ```yaml
-GCP_PROJECT_ID= GCP_PROJECT_ID
+GCP_PROJECT_ID=GCP_PROJECT_ID
 ```
 
 * `GCP_PROJECT_ID` - Google Cloud Project ID. Follow the [docs](https://support.google.com/googleapi/answer/7014113?hl=en) to create

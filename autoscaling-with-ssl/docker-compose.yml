@@ -114,12 +114,19 @@ services:
       R5AS_SASL_PASSWORD: ""
       R5AS_SASL_ENABLED_MECHANISMS: ""
       R5AS_COMMAND_INACTIVITY_GAP_MS: 10000
-      TF_VAR_oci_tenancy_ocid: ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
-      TF_VAR_oci_user_ocid: ocid1.user.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
-      TF_VAR_oci_compartment_id: ocid1.compartment.oc1..aaaaaaaaxxxxxxxxyyyyyyyyyzzzzzzzz
-      TF_VAR_oci_fingerprint: 00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff
-      TF_VAR_oci_private_key_path: /home/ubuntu/.ssh/oracle_private_api_key.pem
-      TF_VAR_oci_node_ssh_public_key_path: /home/ubuntu/.ssh/red5pro_ssh_public_key.pub
+      TF_VAR_oci_tenancy_ocid: $OCI_TENANCY_OCID
+      TF_VAR_oci_user_ocid: $OCI_USER_OCID
+      TF_VAR_oci_compartment_id: $OCI_COMPARTMENT_ID
+      TF_VAR_oci_fingerprint: $OCI_FINGERPRINT
+      TF_VAR_oci_private_key_path: $OCI_PRIVATE_KEY_PATH
+      TF_VAR_oci_node_ssh_public_key_path: $OCI_NODE_SSH_PUBLIC_KEY_PATH
+      TF_VAR_aws_access_key: $AWS_ACCESS_KEY
+      TF_VAR_aws_secret_key: $AWS_SECRET_KEY
+      TF_VAR_aws_ssh_key_pair: $AWS_SSH_KEY_PAIR
+      TF_VAR_aws_enable_root_volume_block_encryption: $AWS_ENABLE_ROOT_VOLUME_BLOCK_ENCRYPTION
+      TF_VAR_gcp_project_id: $GCP_PROJECT_ID
+      TF_VAR_linode_api_token: $LINODE_API_TOKEN
+      TF_VAR_linode_ssh_key_name: $LINODE_SSH_KEY_NAME
       TF_VAR_r5p_license_key: ${R5P_LICENSE_KEY:?R5P_LICENSE_KEY is not set}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

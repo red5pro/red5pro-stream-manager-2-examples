@@ -497,6 +497,9 @@ services:
       - "prometheus.scrape=true"
       - "prometheus.path=/metrics"
 
+volumes:
+  kafka-data:
+
 configs:
   victoria-metrics-docker-scrape:
     content: |

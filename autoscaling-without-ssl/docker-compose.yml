@@ -366,3 +366,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.caddy.entrypoints=web"
       - "traefik.http.routers.caddy.rule=PathPrefix(`/`)"
+
+volumes:
+  kafka-data:

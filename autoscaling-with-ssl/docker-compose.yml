@@ -366,3 +366,6 @@ services:
       - "traefik.http.routers.caddy.entrypoints=websecure"
       - "traefik.http.routers.caddy.tls.certresolver=myresolver"
       - "traefik.http.routers.caddy.rule=PathPrefix(`/`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
+
+volumes:
+  kafka-data:

@@ -62,6 +62,14 @@ KAFKA_HOST=<PRIVATE_IP>
 TRAEFIK_HOST=<DNS_NAME>
 TRAEFIK_SSL_EMAIL=<EMAIL>
 R5P_LICENSE_KEY=<LICENSE_KEY>
+KAFKA_UI_VERSION=<KAFKA_UI_VERSION>
+VICTORIA_METRICS_VMAUTH_VERSION=<VICTORIA_METRICS_VMAUTH_VERSION>
+GRAFANA_VERSION=<GRAFANA_IMAGE_VERSION>
+LOKI_VERSION=<LOKI_IMAGE_VERSION>
+MINIO_VERSION=<MINIO_IMAGE_VERSION>
+PROMTAIL_VERSION=<PROMTAIL_IMAGE_VERSION>
+VICTORIA_METRICS_VERSION=<VICTORIA_METRICS_VERSION>
+NODE_EXPORTER_VERSION=<NODE_EXPORTER_VERSION>
 ```
 
 * `R5AS_AUTH_SECRET` - Authentication secret used to create and authenticate JWTs. Example: `12345abcd`
@@ -74,6 +82,14 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 * `TRAEFIK_HOST` - Stream Manager 2.0 domain name: This should be the same domain name you used to create the DNS record. Example: `red5pro-sm2.example.com`
 * `TRAEFIK_SSL_EMAIL` - The email address that will be used for the SSL certificate.
 * `R5P_LICENSE_KEY` - Red5 Pro license key which will be using on the Red5 Pro nodes. It should be active [Red5 Pro license key](https://account.red5.net/overview), Startup Pro level or higher.
+* `KAFKA_UI_VERSION` - Specify the version of Kafka image to be used: `latest`
+* `VICTORIA_METRICS_VMAUTH_VERSION` - Specify the version of victoria metrics vmauth image to be used: `v1.117.1`
+* `VICTORIA_METRICS_VERSION` - Specify the version of victoria metrics image to be used: `v1.117.1`
+* `GRAFANA_VERSION` - Specify the version of grafana image to be used: `latest`
+* `LOKI_VERSION` - Specify the version of Loki image to be used: `latest`
+* `MINIO_VERSION` - Specify the version of minio image to be used: `latest`
+* `PROMTAIL_VERSION` - Specify the version of promtail image to be used: `latest`
+* `NODE_EXPORTER_VERSION` - Specify the version of promtail image to be used: `latest`
 
 ## Cloud variables for as-terraform service
 
@@ -104,6 +120,14 @@ R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=OCI
 KAFKA_HOST=10.0.0.1
+KAFKA_UI_VERSION=latest
+VICTORIA_METRICS_VMAUTH_VERSION=v1.117.1
+GRAFANA_VERSION=latest
+LOKI_VERSION=latest
+MINIO_VERSION=latest
+PROMTAIL_VERSION=latest
+VICTORIA_METRICS_VERSION=v1.117.1
+NODE_EXPORTER_VERSION=latest
 TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com
 R5P_LICENSE_KEY=1111-2222-3333-4444
@@ -148,6 +172,14 @@ R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=AWS
 KAFKA_HOST=10.0.0.1
+KAFKA_UI_VERSION=latest
+VICTORIA_METRICS_VMAUTH_VERSION=v1.117.1
+GRAFANA_VERSION=latest
+LOKI_VERSION=latest
+MINIO_VERSION=latest
+PROMTAIL_VERSION=latest
+VICTORIA_METRICS_VERSION=v1.117.1
+NODE_EXPORTER_VERSION=latest
 TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com
 R5P_LICENSE_KEY=1111-2222-3333-4444
@@ -177,6 +209,14 @@ R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=LINODE
 KAFKA_HOST=10.0.0.1
+KAFKA_UI_VERSION=latest
+VICTORIA_METRICS_VMAUTH_VERSION=v1.117.1
+GRAFANA_VERSION=latest
+LOKI_VERSION=latest
+MINIO_VERSION=latest
+PROMTAIL_VERSION=latest
+VICTORIA_METRICS_VERSION=v1.117.1
+NODE_EXPORTER_VERSION=latest
 TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com
 R5P_LICENSE_KEY=1111-2222-3333-4444
@@ -202,6 +242,14 @@ R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=GCP
 KAFKA_HOST=10.0.0.1
+KAFKA_UI_VERSION=latest
+VICTORIA_METRICS_VMAUTH_VERSION=v1.117.1
+GRAFANA_VERSION=latest
+LOKI_VERSION=latest
+MINIO_VERSION=latest
+PROMTAIL_VERSION=latest
+VICTORIA_METRICS_VERSION=v1.117.1
+NODE_EXPORTER_VERSION=latest
 TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com
 R5P_LICENSE_KEY=1111-2222-3333-4444

@@ -336,7 +336,7 @@ services:
 
   kafka-ui:
     container_name: kafka-ui
-    image: provectuslabs/kafka-ui:latest
+    image: provectuslabs/kafka-ui:${KAFKA_UI_VERSION:-latest}
     restart: unless-stopped
     ports:
       - 8090:8080
@@ -372,7 +372,7 @@ services:
 #################################################
 
   vmauth:
-    image: victoriametrics/vmauth:latest
+    image: victoriametrics/vmauth:${VICTORIA_METRICS_VMAUTH_VERSION:-v1.117.1}
     command: "-auth.config=/etc/vmauth/vm-auth-config.yaml"
     configs:
       - source: vm-auth-config
@@ -383,7 +383,7 @@ services:
       - "traefik.http.routers.prom-api.entrypoints=websecure"
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:${GRAFANA_VERSION:-latest}
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_AUTH_ANONYMOUS_ENABLED=true
@@ -419,7 +419,7 @@ services:
       - "traefik.http.routers.grafana.entrypoints=websecure"
 
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:${LOKI_VERSION:-latest}
     command: "-config.file=/etc/loki/config.yaml"
     ports:
       - 3100
@@ -437,7 +437,7 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio
+    image: minio/minio:${MINIO_VERSION:-latest}
     entrypoint:
       - sh
       - -euc
@@ -456,7 +456,7 @@ services:
       - ./monitoring/minio-data:/data
 
   promtail:
-    image: grafana/promtail:latest
+    image: grafana/promtail:${PROMTAIL_VERSION:-latest}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/config.yaml
@@ -467,7 +467,7 @@ services:
         target: /etc/promtail/config.yaml
  
   victoria-metrics:
-    image: victoriametrics/victoria-metrics
+    image: victoriametrics/victoria-metrics:${VICTORIA_METRICS_VERSION:-v1.117.1}
     command: -storageDataPath=/victoria-metrics-data -httpListenAddr=:8428 -retentionPeriod=30d -promscrape.config=/etc/vmagent/victoria-metrics-docker-scrape.yaml
     ports:
       - 8428:8428
@@ -479,7 +479,7 @@ services:
         target: /etc/vmagent/victoria-metrics-docker-scrape.yaml
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:${NODE_EXPORTER_VERSION:-latest}
     container_name: node-exporter
     restart: unless-stopped
     volumes:

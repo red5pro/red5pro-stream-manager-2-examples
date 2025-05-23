@@ -46,6 +46,7 @@ R5AS_AUTH_PASS=<PASSWORD>
 R5AS_PROXY_USER=<PROXY_USER>
 R5AS_PROXY_PASS=<PROXY_PASSWORD>
 R5AS_CLOUD_PLATFORM_TYPE=<PLATFORM_TYPE>
+KAFKA_UI_VERSION=<KAFKA_IMAGE_VERSION>
 KAFKA_HOST=<PRIVATE_IP>
 TRAEFIK_HOST=<PUBLIC_IP>
 R5P_LICENSE_KEY=<LICENSE_KEY>
@@ -60,6 +61,7 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 * `KAFKA_HOST` - Kafka server IP address. In this deployment Kafka server on the Stream Manager 2.0 instance so you will need to set Private IP address of this instance. Example: `10.0.0.1`
 * `TRAEFIK_HOST` - The public IP address of the Stream Manager 2.0 instance (server). Example: `1.2.3.4`
 * `R5P_LICENSE_KEY` - Red5 Pro license key which will be using on the Red5 Pro nodes. It should be active [Red5 Pro license key](https://account.red5.net/overview), Startup Pro level or higher.
+* `KAFKA_UI_VERSION` - Specify the version of Kafka image to be used: `latest`
 
 ## Cloud variables for as-terraform service
 
@@ -89,6 +91,7 @@ R5AS_AUTH_PASS=password
 R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=OCI
+KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=1.2.3.4
 R5P_LICENSE_KEY=1111-2222-3333-4444
@@ -132,6 +135,7 @@ R5AS_AUTH_PASS=password
 R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=AWS
+KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=1.2.3.4
 R5P_LICENSE_KEY=1111-2222-3333-4444
@@ -160,6 +164,7 @@ R5AS_AUTH_PASS=password
 R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=LINODE
+KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=1.2.3.4
 R5P_LICENSE_KEY=1111-2222-3333-4444
@@ -184,6 +189,7 @@ R5AS_AUTH_PASS=password
 R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=GCP
+KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=1.2.3.4
 R5P_LICENSE_KEY=1111-2222-3333-4444

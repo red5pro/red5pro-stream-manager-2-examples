@@ -46,6 +46,7 @@ R5AS_AUTH_PASS=<PASSWORD>
 R5AS_PROXY_USER=<PROXY_USER>
 R5AS_PROXY_PASS=<PROXY_PASSWORD>
 R5AS_CLOUD_PLATFORM_TYPE=<PLATFORM_TYPE>
+KAFKA_UI_VERSION=<KAFKA_IMAGE_VERSION>
 KAFKA_HOST=<PRIVATE_IP>
 TRAEFIK_HOST=<DNS_NAME>
 TRAEFIK_SSL_EMAIL=<EMAIL>
@@ -58,6 +59,7 @@ R5P_LICENSE_KEY=<LICENSE_KEY>
 * `R5AS_PROXY_USER` - The authentication proxy username is used to obtain a JWT token that provides access solely to the stream proxy. Example: `proxy_user`
 * `R5AS_PROXY_PASS` - The authentication proxy password is used to obtain a JWT token that provides access solely to the stream proxy. Example: `proxy_password`
 * `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (OCI,AWS,LINODE,GCP). Example for Oracle Cloud: `OCI`
+* `KAFKA_UI_VERSION` - Specify the version of Kafka image to be used: `latest`
 * `KAFKA_HOST` - Kafka server IP address. In this deployment Kafka server on the Stream Manager 2.0 instance so you will need to set Private IP address of this instance. Example: `10.0.0.1`
 * `TRAEFIK_HOST` - Stream Manager 2.0 domain name: This should be the same domain name you used to create the DNS record. Example: `red5pro-sm2.example.com`
 * `TRAEFIK_SSL_EMAIL` - The email address that will be used for the SSL certificate.
@@ -91,6 +93,7 @@ R5AS_AUTH_PASS=password
 R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=OCI
+KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com
@@ -135,6 +138,7 @@ R5AS_AUTH_PASS=password
 R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=AWS
+KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com
@@ -164,6 +168,7 @@ R5AS_AUTH_PASS=password
 R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=LINODE
+KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com
@@ -189,6 +194,7 @@ R5AS_AUTH_PASS=password
 R5AS_PROXY_USER=proxy_user
 R5AS_PROXY_PASS=proxy_password
 R5AS_CLOUD_PLATFORM_TYPE=GCP
+KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com

@@ -13,32 +13,64 @@ services:
       - 9997:9997
     environment:
       KAFKA_BROKER_ID: 1
-      CLUSTER_ID: 'fMCL8kv1SWm87L_Md-I2hg'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka0:29092,PLAINTEXT_HOST://${KAFKA_HOST:?Ensure KAFKA_HOST is set to the IP address reachable by created as-nodes}:9092
+      KAFKA_MAX_REQUEST_SIZE: 52428800
+      KAFKA_INITIAL_BROKER_REGISTRATION_TIMEOUT_MS: 240000
+      # KAFKA_HEAP_OPTS: "-Xmx2g -Xms1g"
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_PROCESS_ROLES: 'broker,controller'
+            
+      # 7 days → 1-24 hours (yours will vary)
+      KAFKA_TRANSACTIONAL_ID_EXPIRATION_MS: 3600000  # 1 hour
+
+      # 7 days → 1-3 days  
+      KAFKA_OFFSETS_RETENTION_MINUTES: 2880  # 2 days
+
+      # 30 seconds → 5-10 seconds (faster leader election)
+      KAFKA_REPLICA_LAG_TIME_MAX_MS: 10000
+
+      # 6000ms → 3000ms (faster failure detection)
+      KAFKA_REPLICA_SOCKET_TIMEOUT_MS: 3000
+      
+      # Use bytes-based retention for predictable disk usage
+      KAFKA_LOG_RETENTION_BYTES: 1073741824  # 1GB per topic
+      # Default retention period
+      KAFKA_LOG_RETENTION_MS: 300000 # 5 minutes
+      # Close segments every 30 seconds to allow frequent cleanup
+      KAFKA_LOG_SEGMENT_MS: 30000  # 30 seconds
+      # Close segments at 16MB to prevent large accumulation
+      KAFKA_LOG_SEGMENT_BYTES: 16777216  # 16MB
+      
+      # More frequent cleanup checks
+      KAFKA_LOG_CLEANUP_INTERVAL_MS: 10000  # 10 seconds (default is 5 minutes)
+      # More frequent deletion checks  
+      KAFKA_LOG_DELETE_DELAY_MS: 1000  # 1 second (default is 1 minute)
+
+      KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_NODE_ID: 1
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka0:29093'
-      KAFKA_LISTENERS: 'PLAINTEXT://kafka0:29092,CONTROLLER://kafka0:29093,PLAINTEXT_HOST://0.0.0.0:9092'
-      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka0:29093"
+      KAFKA_LISTENERS: PLAINTEXT://kafka0:29092,CONTROLLER://kafka0:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       KAFKA_JMX_PORT: 9997
       KAFKA_JMX_OPTS: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=kafka0 -Dcom.sun.management.jmxremote.rmi.port=9997
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_LOG4J_TOOLS_LOGLEVEL: ERROR
+      KAFKA_LOG4J_LOGGERS: 'kafka=WARN,kafka.controller=WARN,kafka.log.LogCleaner=WARN,state.change.logger=WARN,kafka.producer.async.DefaultEventHandler=WARN'
+      KAFKA_CLUSTER_ID: 'fMCL8kv1SWm87L_Md-I2hg'
     volumes:
       - kafka-data:/var/lib/kafka/data
       - ./update_run.sh:/tmp/update_run.sh
     command: "bash -c 'if [ ! -f /tmp/update_run.sh ]; then echo \"ERROR: Script was not found /tmp/update_run.sh\" && exit 1 ; else /tmp/update_run.sh && /etc/confluent/docker/run ; fi'"
     healthcheck:
       test: nc -z localhost 9092 || exit -1
-      start_period: 15s
-      interval: 5s
-      timeout: 10s
-      retries: 10
+      interval: 10s
+      timeout: 60s
+      retries: 18  # 3 mins
+      start_period: 300s  # grace period, not minimum
 
   as-admin:
     image: red5pro/as-admin:${AS_VERSION:-latest}
@@ -49,6 +81,8 @@ services:
     depends_on:
       kafka0:
         condition: service_healthy
+      as-autoscale-service:
+        condition: service_healthy
     ports:
       - 8080
     deploy:
@@ -58,7 +92,7 @@ services:
       R5AS_AUTOSCALE_PARTITIONS: ${R5AS_AUTOSCALE_PARTITIONS:-1}
       R5AS_REPLICATION_FACTOR: ${R5AS_REPLICATION_FACTOR:-1}
       R5AS_BOOTSTRAP_SERVERS: kafka0:29092
-      R5AS_TERRAFORM_QUERY_INTERVAL: 600000
+      R5AS_TERRAFORM_QUERY_INTERVAL: ${R5AS_TERRAFORM_QUERY_INTERVAL:-600000}
       R5AS_SECURITY_PROTOCOL_CONFIG: ""
       R5AS_SSL_KEYSTORE_TYPE_CONFIG: ""
       R5AS_SSL_TRUSTSTORE_TYPE_CONFIG: ""
@@ -80,6 +114,14 @@ services:
       R5AS_AUTH_JWT_TTL_MINUTES: ${R5AS_AUTH_JWT_TTL_MINUTES:-800}
       R5AS_WS_PING_PONG_INTERVAL_S: ${R5AS_WS_PING_PONG_INTERVAL_S:-30}
       R5AS_WS_PONG_TIMEOUT_S: ${R5AS_WS_PONG_TIMEOUT_S:-50}
+      R5AS_PROCESS_NODEGROUP_CONFIG_TIMEOUT: ${R5AS_PROCESS_NODEGROUP_CONFIG_TIMEOUT:-30000}
+      R5AS_CONSUMER_REQUEST_TIMEOUT: ${R5AS_CONSUMER_REQUEST_TIMEOUT:-300000}
+      R5AS_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_CONSUMER_MAX_POLL_INTERVAL:-600000}
+      R5AS_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
+      R5AS_GLOBAL_CONSUMER_REQUEST_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_REQUEST_TIMEOUT:-300000}
+      R5AS_GLOBAL_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_GLOBAL_CONSUMER_MAX_POLL_INTERVAL:-600000}
+      R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
+      R5AS_PRODUCER_REQUEST_TIMEOUT: ${R5AS_PRODUCER_REQUEST_TIMEOUT:-300000}
     labels:
       traefik.http.routers.config-swagger.rule: "PathPrefix(`/swagger-ui`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
       traefik.http.routers.config-swagger.entrypoints: "websecure"
@@ -116,6 +158,15 @@ services:
       R5AS_SASL_PASSWORD: ""
       R5AS_SASL_ENABLED_MECHANISMS: ""
       R5AS_COMMAND_INACTIVITY_GAP_MS: ${R5AS_COMMAND_INACTIVITY_GAP_MS:-10000}
+      R5AS_TERRAFORM_PARALLELISM: ${R5AS_TERRAFORM_PARALLELISM:-50}
+      R5AS_TERRAFORM_TIMEOUT: ${R5AS_TERRAFORM_TIMEOUT:-1800000}
+      R5AS_CONSUMER_REQUEST_TIMEOUT: ${R5AS_CONSUMER_REQUEST_TIMEOUT:-300000}
+      R5AS_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_CONSUMER_MAX_POLL_INTERVAL:-600000}
+      R5AS_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
+      R5AS_GLOBAL_CONSUMER_REQUEST_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_REQUEST_TIMEOUT:-300000}
+      R5AS_GLOBAL_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_GLOBAL_CONSUMER_MAX_POLL_INTERVAL:-600000}
+      R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
+      R5AS_PRODUCER_REQUEST_TIMEOUT: ${R5AS_PRODUCER_REQUEST_TIMEOUT:-300000}
       TF_VAR_oci_tenancy_ocid: ${OCI_TENANCY_OCID}
       TF_VAR_oci_user_ocid: ${OCI_USER_OCID}
       TF_VAR_oci_compartment_id: ${OCI_COMPARTMENT_ID}
@@ -144,8 +195,8 @@ services:
     ports:
       - 9080:8080
     environment:
-      R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_REPLICATION_FACTOR: ${R5AS_REPLICATION_FACTOR:-1}
+      R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_BOOTSTRAP_SERVERS: kafka0:29092
       R5AS_SECURITY_PROTOCOL_CONFIG: ""
       R5AS_SSL_KEYSTORE_TYPE_CONFIG: ""
@@ -154,16 +205,17 @@ services:
       R5AS_SASL_USERNAME: ""
       R5AS_SASL_PASSWORD: ""
       R5AS_SASL_ENABLED_MECHANISMS: ""
+      R5AS_TRAEFIK_HOST: ${TRAEFIK_HOST:-localhost}
       R5AS_AUTH_SECRET: ${R5AS_AUTH_SECRET:?R5AS_AUTH_SECRET is not set}
       R5AS_AUTH_JWT_TTL_MINUTES: ${R5AS_AUTH_JWT_TTL_MINUTES:-800}
-      R5AS_TRAEFIK_HOST: ${TRAEFIK_HOST:-localhost}
       R5AS_AUTOSCALE_DOMAIN: ${TRAEFIK_HOST:-localhost}
+      R5AS_PROXY_HTTP_REQUEST_TIMEOUT_S: ${R5AS_PROXY_HTTP_REQUEST_TIMEOUT_S:-60}
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.asproxy.rule=PathPrefix(`/as/v1/proxy`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-      - "traefik.http.routers.asproxy.entrypoints=websecure"
-      - "traefik.http.routers.asproxy.middlewares=strip-asproxy@docker"
-      - "traefik.http.middlewares.strip-asproxy.stripprefix.prefixes=/as/v1/proxy"
+      traefik.enable: true
+      traefik.http.routers.asproxy.rule: PathPrefix(`/as/v1/proxy`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.asproxy.entrypoints: websecure
+      traefik.http.routers.asproxy.middlewares: strip-asproxy@docker
+      traefik.http.middlewares.strip-asproxy.stripprefix.prefixes: /as/v1/proxy
 
   as-autoscale-service:
     image: red5pro/as-autoscale-service:${AS_VERSION:-latest}
@@ -175,8 +227,6 @@ services:
         condition: service_healthy
       as-terraform:
         condition: service_started
-      as-admin:
-        condition: service_started
       as-auth:
         condition: service_started
       as-streams:
@@ -186,15 +236,20 @@ services:
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/autoscale/healthz"]
-      start_period: 10s
+      interval: 10s
+      timeout: 60s
+      retries: 18  # 3 mins
+      start_period: 300s  # grace period, not minimum
     ports:
       - "8080"
     environment:
-      R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_AUTOSCALE_PARTITIONS: ${R5AS_AUTOSCALE_PARTITIONS:-1}
       R5AS_REPLICATION_FACTOR: ${R5AS_REPLICATION_FACTOR:-1}
+      R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_BOOTSTRAP_SERVERS: kafka0:29092
       R5AS_BOOTSTRAP_SERVERS_FOR_NODES: ${KAFKA_HOST:?Ensure KAFKA_HOST is set to the IP address reachable by created as-nodes}:9092
+      R5AS_AUTOCALE_EVALUATION_INTERVAL: ${R5AS_AUTOCALE_EVALUATION_INTERVAL:-4000}
+      R5AS_APPLICATION_HOST: ${TRAEFIK_HOST:-localhost}
       R5AS_SECURITY_PROTOCOL_CONFIG: ""
       R5AS_SSL_KEYSTORE_TYPE_CONFIG: ""
       R5AS_SSL_TRUSTSTORE_TYPE_CONFIG: ""
@@ -202,22 +257,55 @@ services:
       R5AS_SASL_USERNAME: ""
       R5AS_SASL_PASSWORD: ""
       R5AS_SASL_ENABLED_MECHANISMS: ""
-      R5AS_AUTOCALE_EVALUATION_INTERVAL: ${R5AS_AUTOCALE_EVALUATION_INTERVAL:-4000}
       R5AS_TRAEFIK_HOST: ${TRAEFIK_HOST:-localhost}
       R5AS_AUTH_SECRET: ${R5AS_AUTH_SECRET}
       R5AS_AUTH_JWT_TTL_MINUTES: ${R5AS_AUTH_JWT_TTL_MINUTES:-800}
+
+      # 2400000 = 4 * 60 * 1000, 4 hours
+      R5AS_NODE_REQUEST_TIMEOUT: ${R5AS_NODE_REQUEST_TIMEOUT:-2400000}
+      R5AS_NODE_CREATED_TIMEOUT: ${R5AS_NODE_CREATED_TIMEOUT:-2400000}
+      R5AS_NODE_CREATING_TIMEOUT: ${R5AS_NODE_CREATING_TIMEOUT:-2400000}
+      R5AS_NODE_STARTED_TIMEOUT: ${R5AS_NODE_STARTED_TIMEOUT:-2400000}
+      R5AS_NODE_SUNSET_TIMEOUT: ${R5AS_NODE_SUNSET_TIMEOUT:-2400000}
+      R5AS_NODE_DOOMED_TIMEOUT: ${R5AS_NODE_DOOMED_TIMEOUT:-2400000}
+
+      # Note that R5AS_NODE_FAULT_TIMEOUT can be negative meaning, no timeout
+      # this logic does not apply universally to other timeouts
+      R5AS_NODE_FAULT_TIMEOUT: ${R5AS_NODE_FAULT_TIMEOUT:-300000} # 5 minutes
+
+      R5AS_NODE_STATUS: ${R5AS_NODE_STATUS:-60000}
+
+      R5AS_FAILED_NODE_THRESHOLD: ${R5AS_FAILED_NODE_THRESHOLD:-100}
+      
+      R5AS_CONSUMER_REQUEST_TIMEOUT: ${R5AS_CONSUMER_REQUEST_TIMEOUT:-300000}
+      R5AS_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_CONSUMER_MAX_POLL_INTERVAL:-600000}
+      R5AS_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
+      R5AS_GLOBAL_CONSUMER_REQUEST_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_REQUEST_TIMEOUT:-300000}
+      R5AS_GLOBAL_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_GLOBAL_CONSUMER_MAX_POLL_INTERVAL:-600000}
+      R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
+      R5AS_PRODUCER_REQUEST_TIMEOUT: ${R5AS_PRODUCER_REQUEST_TIMEOUT:-300000}
+
+      R5AS_CONSUMER_SESSION_TIMEOUT_MS: ${R5AS_CONSUMER_SESSION_TIMEOUT_MS:-60000}
+      R5AS_CONSUMER_HEARTBEAT_INTERVAL_MS: ${R5AS_CONSUMER_HEARTBEAT_INTERVAL_MS:-20000}
+      R5AS_CONSUMER_MAX_POLL_INTERVAL_MS: ${R5AS_CONSUMER_MAX_POLL_INTERVAL_MS:-300000}
+      R5AS_CONSUMER_GROUP_INSTANCE_ID_SUFFIX: ${R5AS_CONSUMER_GROUP_INSTANCE_ID_SUFFIX:-}
+      R5AS_CONSUMER_PARTITION_ASSIGNMENT_STRATEGY: ${R5AS_CONSUMER_PARTITION_ASSIGNMENT_STRATEGY:-org.apache.kafka.clients.consumer.CooperativeStickyAssignor}
+      R5AS_STREAMS_COMMIT_INTERVAL_MS: ${R5AS_STREAMS_COMMIT_INTERVAL_MS:-1000}
+      R5AS_PRODUCER_BATCH_SIZE: ${R5AS_PRODUCER_BATCH_SIZE:-65536}
+      R5AS_PRODUCER_LINGER_MS: ${R5AS_PRODUCER_LINGER_MS:-50}
+      R5AS_PRODUCER_TRANSACTION_TIMEOUT: ${R5AS_PRODUCER_TRANSACTION_TIMEOUT:-900000}
     labels:
-      - "prometheus.scrape=true"
-      - "prometheus.path=/metrics"
-      - "traefik.enable=true"
-      - "traefik.http.routers.autoscale-springdoc.rule=PathPrefix(`/as/v1/autoscale/v3`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-      - "traefik.http.routers.autoscale-springdoc.entrypoints=websecure"
-      - "traefik.http.routers.autoscale-springdoc.middlewares=strip-autoscale@docker"
-      - "traefik.http.middlewares.strip-autoscale.stripprefix.prefixes=/as/v1/autoscale"
-      - "traefik.http.routers.autoscale.rule=PathPrefix(`/as/v1/autoscale`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-      - "traefik.http.routers.autoscale.entrypoints=websecure"
-      - "traefik.http.routers.autoscale.middlewares=strip-m-autoscale@docker"
-      - "traefik.http.middlewares.strip-m-autoscale.stripprefix.prefixes=/as/v1"
+      traefik.enable: true
+      prometheus.scrape: true
+      prometheus.path: /metrics
+      traefik.http.routers.autoscale-springdoc.rule: PathPrefix(`/as/v1/autoscale/v3`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.autoscale-springdoc.entrypoints: websecure
+      traefik.http.routers.autoscale-springdoc.middlewares: strip-autoscale@docker
+      traefik.http.middlewares.strip-autoscale.stripprefix.prefixes: /as/v1/autoscale
+      traefik.http.routers.autoscale.rule: PathPrefix(`/as/v1/autoscale`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.autoscale.entrypoints: websecure
+      traefik.http.routers.autoscale.middlewares: strip-m-autoscale@docker
+      traefik.http.middlewares.strip-m-autoscale.stripprefix.prefixes: /as/v1
 
   as-auth:
     image: red5pro/as-auth:${AS_VERSION:-latest}
@@ -234,11 +322,11 @@ services:
       R5AS_SPATIAL_USER: ${R5AS_SPATIAL_USER:-spatial_user}
       R5AS_SPATIAL_PASS: ${R5AS_SPATIAL_PASS:-spatial_pass}
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.asauth.rule=PathPrefix(`/as/v1/auth`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-      - "traefik.http.routers.asauth.entrypoints=websecure"
-      - "traefik.http.routers.asauth.middlewares=strip-asauth@docker"     
-      - "traefik.http.middlewares.strip-asauth.stripprefix.prefixes=/as/v1"
+      traefik.enable: true
+      traefik.http.routers.asauth.rule: PathPrefix(`/as/v1/auth`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.asauth.entrypoints: websecure
+      traefik.http.routers.asauth.middlewares: strip-asauth@docker
+      traefik.http.middlewares.strip-asauth.stripprefix.prefixes: /as/v1
 
   as-streams:
     image: red5pro/as-streams:${AS_VERSION:-latest}
@@ -250,12 +338,18 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/streams/stream/healthz"]
-      start_period: 10s
+      interval: 10s
+      timeout: 60s
+      retries: 18  # 3 mins
+      start_period: 300s  # grace period, not minimum
     environment:
-      R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_AUTH_SECRET: ${R5AS_AUTH_SECRET:?R5AS_AUTH_SECRET is not set}
       R5AS_AUTH_JWT_TTL_MINUTES: ${R5AS_AUTH_JWT_TTL_MINUTES:-800}
+      R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_BOOTSTRAP_SERVERS: kafka0:29092
+      R5AS_MESSAGE_BUS_CLEAR_STREAMS: ${R5AS_MESSAGE_BUS_CLEAR_STREAMS:-false}
+      R5AS_AUTOSCALE_PARTITIONS: ${R5AS_AUTOSCALE_PARTITIONS:-1}
+      R5AS_REPLICATION_FACTOR: ${R5AS_REPLICATION_FACTOR:-1}
       R5AS_SECURITY_PROTOCOL_CONFIG: ""
       R5AS_SSL_KEYSTORE_TYPE_CONFIG: ""
       R5AS_SSL_TRUSTSTORE_TYPE_CONFIG: ""
@@ -263,19 +357,34 @@ services:
       R5AS_SASL_USERNAME: ""
       R5AS_SASL_PASSWORD: ""
       R5AS_SASL_ENABLED_MECHANISMS: ""
-      R5AS_MESSAGE_BUS_CLEAR_STREAMS: ${R5AS_MESSAGE_BUS_CLEAR_STREAMS:-false}
-      R5AS_AUTOSCALE_PARTITIONS: ${R5AS_AUTOSCALE_PARTITIONS:-1}
-      R5AS_REPLICATION_FACTOR: ${R5AS_REPLICATION_FACTOR:-1}
       R5AS_RESTREAMER_REDISTRIBUTE_SECONDS: ${R5AS_RESTREAMER_REDISTRIBUTE_SECONDS:-60}
       R5AS_STREAM_TIMEOUT: ${R5AS_STREAM_TIMEOUT:-30}
+
+      R5AS_CONSUMER_REQUEST_TIMEOUT: ${R5AS_CONSUMER_REQUEST_TIMEOUT:-300000}
+      R5AS_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_CONSUMER_MAX_POLL_INTERVAL:-600000}
+      R5AS_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
+      R5AS_GLOBAL_CONSUMER_REQUEST_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_REQUEST_TIMEOUT:-300000}
+      R5AS_GLOBAL_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_GLOBAL_CONSUMER_MAX_POLL_INTERVAL:-600000}
+      R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
+      R5AS_PRODUCER_REQUEST_TIMEOUT: ${R5AS_PRODUCER_REQUEST_TIMEOUT:-300000}
+
+      R5AS_CONSUMER_SESSION_TIMEOUT_MS: ${R5AS_CONSUMER_SESSION_TIMEOUT_MS:-60000}
+      R5AS_CONSUMER_HEARTBEAT_INTERVAL_MS: ${R5AS_CONSUMER_HEARTBEAT_INTERVAL_MS:-20000}
+      R5AS_CONSUMER_MAX_POLL_INTERVAL_MS: ${R5AS_CONSUMER_MAX_POLL_INTERVAL_MS:-300000}
+      R5AS_CONSUMER_GROUP_INSTANCE_ID_SUFFIX: ${R5AS_CONSUMER_GROUP_INSTANCE_ID_SUFFIX:-}
+      R5AS_CONSUMER_PARTITION_ASSIGNMENT_STRATEGY: ${R5AS_CONSUMER_PARTITION_ASSIGNMENT_STRATEGY:-org.apache.kafka.clients.consumer.CooperativeStickyAssignor}
+      R5AS_STREAMS_COMMIT_INTERVAL_MS: ${R5AS_STREAMS_COMMIT_INTERVAL_MS:-1000}
+      R5AS_PRODUCER_BATCH_SIZE: ${R5AS_PRODUCER_BATCH_SIZE:-65536}
+      R5AS_PRODUCER_LINGER_MS: ${R5AS_PRODUCER_LINGER_MS:-50}
+      R5AS_PRODUCER_TRANSACTION_TIMEOUT: ${R5AS_PRODUCER_TRANSACTION_TIMEOUT:-900000}
     labels:
-      - "prometheus.scrape=true"
-      - "prometheus.path=/streams/metrics"
-      - "traefik.enable=true"
-      - "traefik.http.routers.asstreams.rule=PathPrefix(`/as/v1/streams`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-      - "traefik.http.routers.asstreams.entrypoints=websecure"
-      - "traefik.http.routers.asstreams.middlewares=strip-asstreams@docker"
-      - "traefik.http.middlewares.strip-asstreams.stripprefix.prefixes=/as/v1"
+      prometheus.scrape: true
+      prometheus.path: /streams/metrics
+      traefik.enable: true
+      traefik.http.routers.asstreams.rule: PathPrefix(`/as/v1/streams`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.asstreams.entrypoints: websecure
+      traefik.http.routers.asstreams.middlewares: strip-asstreams@docker
+      traefik.http.middlewares.strip-asstreams.stripprefix.prefixes: /as/v1
 
   reverse-proxy:
     image: traefik
@@ -299,11 +408,16 @@ services:
       - "./letsencrypt:/letsencrypt"
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik-ui.entrypoints=websecure"
-      - "traefik.http.routers.traefik-ui.tls.certresolver=myresolver"
-      - "traefik.http.routers.traefik-ui.rule=(PathPrefix(`/dashboard`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)) || (PathPrefix(`/api`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`))"
-      - "traefik.http.services.traefik-ui.loadbalancer.server.port=8080"
+      traefik.enable: true
+      traefik.http.routers.traefik-ui.entrypoints: websecure
+      traefik.http.routers.traefik-ui.tls.certresolver: myresolver
+      traefik.http.routers.traefik-ui.rule: (PathPrefix(`/dashboard`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)) || (PathPrefix(`/api`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`))
+      traefik.http.services.traefik-ui.loadbalancer.server.port: 8080
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   as-testbeds:
      image: red5pro/as-testbed:${AS_VERSION:-latest}
@@ -318,21 +432,21 @@ services:
      ports:
        - 12080:80
      labels:
-       - "traefik.enable=true"
-       - "traefik.http.routers.red5.rule=PathPrefix(`/red5`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-       - "traefik.http.routers.service.tls=true"
-       - "traefik.http.routers.red5.entrypoints=websecure"
-       - "traefik.http.services.testbed-service.loadbalancer.server.port=80"
-       - "traefik.http.routers.red5css.rule=PathPrefix(`/css`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-       - "traefik.http.routers.red5images.rule=PathPrefix(`/images`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-       - "traefik.http.routers.red5lib.rule=PathPrefix(`/lib`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-       - "traefik.http.routers.red5script.rule=PathPrefix(`/script`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-       - "traefik.http.routers.red5.middlewares=our-slash@docker"
-       - "traefik.http.middlewares.our-slash.chain.middlewares=strip-prefix-1,strip-prefix-2"
-       - "traefik.http.middlewares.strip-prefix-1.redirectregex.regex=^(https?://[^/]+/[a-z0-9_]+)$$"
-       - "traefik.http.middlewares.strip-prefix-1.redirectregex.replacement=$${1}/"
-       - "traefik.http.middlewares.strip-prefix-1.redirectregex.permanent=true"
-       - "traefik.http.middlewares.strip-prefix-2.stripprefixregex.regex=/[a-z0-9_]+"
+      traefik.enable: true
+      traefik.http.routers.red5.rule: PathPrefix(`/red5`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.service.tls: true
+      traefik.http.routers.red5.entrypoints: websecure
+      traefik.http.services.testbed-service.loadbalancer.server.port: 80
+      traefik.http.routers.red5css.rule: PathPrefix(`/css`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.red5images.rule: PathPrefix(`/images`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.red5lib.rule: PathPrefix(`/lib`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.red5script.rule: PathPrefix(`/script`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.red5.middlewares: our-slash@docker
+      traefik.http.middlewares.our-slash.chain.middlewares: strip-prefix-1,strip-prefix-2
+      traefik.http.middlewares.strip-prefix-1.redirectregex.regex: ^(https?://[^/]+/[a-z0-9_]+)$
+      traefik.http.middlewares.strip-prefix-1.redirectregex.replacement: $${1}/
+      traefik.http.middlewares.strip-prefix-1.redirectregex.permanent: true
+      traefik.http.middlewares.strip-prefix-2.stripprefixregex.regex: /[a-z0-9_]+
 
   kafka-ui:
     container_name: kafka-ui
@@ -354,18 +468,18 @@ services:
       KAFKA_CLUSTERS_0_AUDIT_CONSOLEAUDITENABLED: 'true'
       SERVER_SERVLET_CONTEXT_PATH: /kafka
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.kafka-ui.rule=PathPrefix(`/kafka`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
-      - "traefik.http.routers.kafka-ui.entrypoints=websecure"
+      traefik.enable: true
+      traefik.http.routers.kafka-ui.rule: PathPrefix(`/kafka`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
+      traefik.http.routers.kafka-ui.entrypoints: websecure
 
   as-debug-ui:
     image: red5pro/as-debug-ui:${AS_VERSION:-latest}
     restart: unless-stopped
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.caddy.entrypoints=websecure"
-      - "traefik.http.routers.caddy.tls.certresolver=myresolver"
-      - "traefik.http.routers.caddy.rule=PathPrefix(`/`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)"
+      traefik.enable: true
+      traefik.http.routers.caddy.entrypoints: websecure
+      traefik.http.routers.caddy.tls.certresolver: myresolver
+      traefik.http.routers.caddy.rule: PathPrefix(`/`) && Host(`${TRAEFIK_HOST:?Ensure TRAEFIK_HOST is set to the DNS name of your server.}`)
 
 #################################################
 # Monitoring (logging + metrics)

@@ -23,7 +23,7 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-            
+      
       # 7 days → 1-24 hours (yours will vary)
       KAFKA_TRANSACTIONAL_ID_EXPIRATION_MS: 3600000  # 1 hour
 
@@ -48,8 +48,8 @@ services:
       # More frequent cleanup checks
       KAFKA_LOG_CLEANUP_INTERVAL_MS: 10000  # 10 seconds (default is 5 minutes)
       # More frequent deletion checks  
-      KAFKA_LOG_DELETE_DELAY_MS: 1000  # 1 second (default is 1 minute)
-
+      KAFKA_LOG_DELETE_DELAY_MS: 1000  # 1 second (default is 1 minute)      
+            
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_NODE_ID: 1
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka0:29093"
@@ -317,6 +317,10 @@ services:
       R5AS_NODE_STATUS: ${R5AS_NODE_STATUS:-60000}
 
       R5AS_FAILED_NODE_THRESHOLD: ${R5AS_FAILED_NODE_THRESHOLD:-5}
+
+      # Should FAULT nodes be reinstated if they begin sending ClusterNodeEvents?
+      # Use true for production environments. Leave false to diagnose issues.
+      R5AS_AUTO_REINSTATE_FAULT_NODES: ${R5AS_AUTO_REINSTATE_FAULT_NODES:-true}
       
       R5AS_CONSUMER_REQUEST_TIMEOUT: ${R5AS_CONSUMER_REQUEST_TIMEOUT:-300000}
       R5AS_CONSUMER_MAX_POLL_INTERVAL: ${R5AS_CONSUMER_MAX_POLL_INTERVAL:-600000}

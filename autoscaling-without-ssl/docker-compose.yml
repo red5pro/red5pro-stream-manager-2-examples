@@ -71,6 +71,11 @@ services:
       timeout: 60s
       retries: 18  # 3 mins
       start_period: 300s  # grace period, not minimum
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   as-kafka-init:
     deploy:
@@ -107,6 +112,11 @@ services:
       R5AS_KAFKA_CLIENT_TIMEOUT: ${R5AS_KAFKA_CLIENT_TIMEOUT:-10000}
       R5AS_HEALTH_CHECK_INTERVAL: ${R5AS_HEALTH_CHECK_INTERVAL:-30000}
       R5AS_PRODUCE_CONSUME_TEST_TIMEOUT: ${R5AS_PRODUCE_CONSUME_TEST_TIMEOUT:-15000}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3" 
 
   as-admin:
     image: red5pro/as-admin:${AS_VERSION:-latest}
@@ -159,6 +169,11 @@ services:
       R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
       R5AS_PRODUCER_REQUEST_TIMEOUT: ${R5AS_PRODUCER_REQUEST_TIMEOUT:-300000}
       R5AS_GROUP_INSTANCE_ID: ${R5AS_GROUP_INSTANCE_ID:-1}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       traefik.http.routers.config-swagger.rule: "PathPrefix(`/swagger-ui`)"
       traefik.http.routers.config-swagger.entrypoints: "web"
@@ -225,6 +240,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./keys/oracle_private_api_key.pem:/home/ubuntu/.ssh/oracle_private_api_key.pem
       - ./keys/red5pro_ssh_public_key.pub:/home/ubuntu/.ssh/red5pro_ssh_public_key.pub
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     
   as-proxy:
     image: red5pro/as-proxy:${AS_VERSION:-latest}
@@ -251,6 +271,11 @@ services:
       # R5AS_AUTOSCALE_DOMAIN: ${TRAEFIK_HOST:-localhost}
       R5AS_PROXY_HTTP_REQUEST_TIMEOUT_S: ${R5AS_PROXY_HTTP_REQUEST_TIMEOUT_S:-60}
       R5AS_GROUP_INSTANCE_ID: ${R5AS_GROUP_INSTANCE_ID:-1}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       traefik.enable: true
       traefik.http.routers.asproxy.rule: PathPrefix(`/as/v1/proxy`)
@@ -339,6 +364,11 @@ services:
       R5AS_PRODUCER_BATCH_SIZE: ${R5AS_PRODUCER_BATCH_SIZE:-65536}
       R5AS_PRODUCER_LINGER_MS: ${R5AS_PRODUCER_LINGER_MS:-50}
       R5AS_PRODUCER_TRANSACTION_TIMEOUT: ${R5AS_PRODUCER_TRANSACTION_TIMEOUT:-900000}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       traefik.enable: true
       prometheus.scrape: true
@@ -368,6 +398,11 @@ services:
       R5AS_PROXY_PASS: ${R5AS_PROXY_PASS:?R5AS_PROXY_PASS is not set}
       R5AS_SPATIAL_USER: ${R5AS_SPATIAL_USER:-spatial_user}
       R5AS_SPATIAL_PASS: ${R5AS_SPATIAL_PASS:-spatial_pass}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       traefik.enable: true
       traefik.http.routers.asauth.rule: PathPrefix(`/as/v1/auth`)
@@ -425,6 +460,11 @@ services:
       R5AS_PRODUCER_LINGER_MS: ${R5AS_PRODUCER_LINGER_MS:-50}
       R5AS_PRODUCER_TRANSACTION_TIMEOUT: ${R5AS_PRODUCER_TRANSACTION_TIMEOUT:-900000}
       R5AS_GROUP_INSTANCE_ID: ${R5AS_GROUP_INSTANCE_ID:-1}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       prometheus.scrape: true
       prometheus.path: /streams/metrics
@@ -473,6 +513,11 @@ services:
          condition: service_started
      ports:
        - 12080:80
+     logging:
+       driver: "json-file"
+       options:
+         max-size: "10m"
+         max-file: "3"
      labels:
       traefik.enable: true
       traefik.http.routers.red5.rule: PathPrefix(`/red5`)
@@ -509,6 +554,11 @@ services:
       KAFKA_CLUSTERS_0_AUDIT_TOPICAUDITENABLED: 'true'
       KAFKA_CLUSTERS_0_AUDIT_CONSOLEAUDITENABLED: 'true'
       SERVER_SERVLET_CONTEXT_PATH: /kafka
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       traefik.enable: true
       traefik.http.routers.kafka-ui.rule: PathPrefix(`/kafka`)
@@ -517,6 +567,11 @@ services:
   as-debug-ui:
     image: red5pro/as-debug-ui:${AS_VERSION:-latest}
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       traefik.enable: true
       traefik.http.routers.caddy.entrypoints: web

@@ -77,7 +77,7 @@ NODE_EXPORTER_VERSION=<NODE_EXPORTER_VERSION>
 * `R5AS_AUTH_PASS` - Authentication admin user password used to get JWT token. Example: `password`
 * `R5AS_PROXY_USER` - The authentication proxy username is used to obtain a JWT token that provides access solely to the stream proxy. Example: `proxy_user`
 * `R5AS_PROXY_PASS` - The authentication proxy password is used to obtain a JWT token that provides access solely to the stream proxy. Example: `proxy_password`
-* `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (OCI,AWS,LINODE,GCP). Example for Oracle Cloud: `OCI`
+* `R5AS_CLOUD_PLATFORM_TYPE` - Cloud platform type (OCI,AWS,LINODE,GCP,DO). Example for Oracle Cloud: `OCI`
 * `KAFKA_HOST` - Kafka server IP address. In this deployment Kafka server on the Stream Manager 2.0 instance so you will need to set Private IP address of this instance. Example: `10.0.0.1`
 * `TRAEFIK_HOST` - Stream Manager 2.0 domain name: This should be the same domain name you used to create the DNS record. Example: `red5pro-sm2.example.com`
 * `TRAEFIK_SSL_EMAIL` - The email address that will be used for the SSL certificate.
@@ -93,7 +93,7 @@ NODE_EXPORTER_VERSION=<NODE_EXPORTER_VERSION>
 
 ## Cloud variables for as-terraform service
 
-Each cloud provider has own cloud variables (OCI, AWS, LINODE, GCP)  
+Each cloud provider has own cloud variables (OCI, AWS, LINODE, GCP, DO)  
 These variables can be configured directly in the `.env` file.
 
 ### OCI specific variables
@@ -254,4 +254,43 @@ TRAEFIK_HOST=red5pro-sm2.example.com
 TRAEFIK_SSL_EMAIL=email@example.com
 R5P_LICENSE_KEY=1111-2222-3333-4444
 GCP_PROJECT_ID=example-gcp-project-name
+```
+
+### DigitalOcean specific variables
+
+```conf
+DIGITAL_OCEAN_API_TOKEN=<API_TOKEN>
+DIGITAL_OCEAN_SSH_KEY_NAME=<SSH_KEY_NAME>
+DIGITAL_OCEAN_PROJECT_NAME=<PROJECT_NAME>
+```
+
+* `DIGITAL_OCEAN_API_TOKEN` - DigitalOcean API token to authenticate with cloud. Follow the [docs](https://docs.digitalocean.com/reference/api/create-personal-access-token/) to create
+* `DIGITAL_OCEAN_SSH_KEY_NAME` - SSH key name. It will be using for SSH connect to Red5 Pro nodes. Follow the [docs](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to create SSH key pair in DigitalOcean.
+* `DIGITAL_OCEAN_PROJECT_NAME` - DigitalOcean project name to create all resource in specified project. Follow the [docs](https://docs.digitalocean.com/products/projects/how-to/create/) to create
+
+
+Example `.env` configuration for DO
+
+```conf
+R5AS_AUTH_SECRET=12345abcd
+R5AS_AUTH_USER=admin
+R5AS_AUTH_PASS=password
+R5AS_PROXY_USER=proxy_user
+R5AS_PROXY_PASS=proxy_password
+R5AS_CLOUD_PLATFORM_TYPE=GCP
+KAFKA_HOST=10.0.0.1
+KAFKA_UI_VERSION=latest
+VICTORIA_METRICS_VMAUTH_VERSION=v1.117.1
+GRAFANA_VERSION=latest
+LOKI_VERSION=latest
+MINIO_VERSION=latest
+PROMTAIL_VERSION=latest
+VICTORIA_METRICS_VERSION=v1.117.1
+NODE_EXPORTER_VERSION=latest
+TRAEFIK_HOST=red5pro-sm2.example.com
+TRAEFIK_SSL_EMAIL=email@example.com
+R5P_LICENSE_KEY=1111-2222-3333-4444
+DIGITAL_OCEAN_API_TOKEN=dop_v1_xxxxxxxx
+DIGITAL_OCEAN_SSH_KEY_NAME=example-ssh-key-name
+DIGITAL_OCEAN_PROJECT_NAME=example-do-project-name
 ```

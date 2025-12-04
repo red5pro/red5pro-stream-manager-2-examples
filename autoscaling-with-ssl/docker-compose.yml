@@ -234,6 +234,9 @@ services:
       TF_VAR_linode_api_token: ${LINODE_API_TOKEN}
       TF_VAR_linode_ssh_key_name: ${LINODE_SSH_KEY_NAME}
       TF_VAR_r5p_license_key: ${R5P_LICENSE_KEY:?R5P_LICENSE_KEY is not set}
+      TF_VAR_digitalocean_api_token: ${DIGITAL_OCEAN_API_TOKEN}
+      TF_VAR_digitalocean_project_name: ${DIGITAL_OCEAN_PROJECT_NAME}
+      TF_VAR_digitalocean_ssh_key_name: ${DIGITAL_OCEAN_SSH_KEY_NAME}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./keys/oracle_private_api_key.pem:/home/ubuntu/.ssh/oracle_private_api_key.pem

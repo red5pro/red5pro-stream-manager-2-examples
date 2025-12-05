@@ -201,3 +201,35 @@ TRAEFIK_SSL_EMAIL=email@example.com
 R5P_LICENSE_KEY=1111-2222-3333-4444
 GCP_PROJECT_ID=example-gcp-project-name
 ```
+
+### DigitalOcean specific variables
+
+```conf
+DIGITAL_OCEAN_API_TOKEN=<API_TOKEN>
+DIGITAL_OCEAN_SSH_KEY_NAME=<SSH_KEY_NAME>
+DIGITAL_OCEAN_PROJECT_NAME=<PROJECT_NAME>
+```
+
+* `DIGITAL_OCEAN_API_TOKEN` - DigitalOcean API token to authenticate with cloud. Follow the [docs](https://docs.digitalocean.com/reference/api/create-personal-access-token/) to create
+* `DIGITAL_OCEAN_SSH_KEY_NAME` - SSH key name. It will be using for SSH connect to Red5 Pro nodes. Follow the [docs](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to create SSH key pair in DigitalOcean.
+* `DIGITAL_OCEAN_PROJECT_NAME` - DigitalOcean project name to create all resource in specified project. Follow the [docs](https://docs.digitalocean.com/products/projects/how-to/create/) to create
+
+
+Example `.env` configuration for DO
+
+```conf
+R5AS_AUTH_SECRET=12345abcd
+R5AS_AUTH_USER=admin
+R5AS_AUTH_PASS=password
+R5AS_PROXY_USER=proxy_user
+R5AS_PROXY_PASS=proxy_password
+R5AS_CLOUD_PLATFORM_TYPE=GCP
+KAFKA_UI_VERSION=latest
+KAFKA_HOST=10.0.0.1
+TRAEFIK_HOST=red5pro-sm2.example.com
+TRAEFIK_SSL_EMAIL=email@example.com
+R5P_LICENSE_KEY=1111-2222-3333-4444
+DIGITAL_OCEAN_API_TOKEN=dop_v1_xxxxxxxx
+DIGITAL_OCEAN_SSH_KEY_NAME=example-ssh-key-name
+DIGITAL_OCEAN_PROJECT_NAME=example-do-project-name
+```

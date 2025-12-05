@@ -3,6 +3,19 @@
 It is simple docker-compose.yml which include main Stream Manager 2.0 (AS) services without SSL certificate and HTTPS.
 This example is usefull if SSL termination is working on the Load Balancer or on the CloudFlare
 
+## Recommended: Use Terraform Modules
+
+> **We strongly recommend using the official Red5 Pro Terraform modules** for deploying Stream Manager instances. These modules automatically handle IAM role creation, instance profiles, security groups, and all required infrastructure, ensuring best practices and security compliance.
+
+**Available Terraform Modules:**
+- **AWS**: [red5pro/aws](https://registry.terraform.io/modules/red5pro/red5pro/aws/latest) - AWS Infrastructure deployment
+- **OCI**: [red5pro/oci](https://registry.terraform.io/modules/red5pro/red5pro/oci/latest) - Oracle Cloud Infrastructure deployment
+- **GCP**: [red5pro/gcp](https://registry.terraform.io/modules/red5pro/red5pro/gcp/latest) - Google Cloud Platform deployment
+- **Linode**: [red5pro/linode](https://registry.terraform.io/modules/red5pro/red5pro/linode/latest) - Linode deployment
+- **Digital Ocean**: [red5pro/digitalocean](https://registry.terraform.io/modules/red5pro/red5pro/digitalocean/latest) - Digital Ocean deployment
+
+If you're deploying manually (without using these Terraform modules), please follow the manual setup instructions below.
+
 ## Micro Services
 
 * kafka
@@ -115,14 +128,12 @@ mkdir -p /usr/local/stream-manager/keys
 ### AWS specific variables
 
 ```conf
-AWS_ACCESS_KEY=<ACCESS_KEY>
-AWS_SECRET_KEY=<SECRET_KEY>
 AWS_SSH_KEY_PAIR=<SSH_KEY_PAIR>
 AWS_ENABLE_ROOT_VOLUME_BLOCK_ENCRYPTION=<true or false>
 ```
 
-* `AWS_ACCESS_KEY` - AWS access key to authenticate with AWS account. Follow the [docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) to create
-* `AWS_SECRET_KEY` - AWS secret key to authenticate with AWS account. Follow the [docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html) to create
+> **Note:** AWS authentication uses IAM role-based authentication via instance profiles. The Stream Manager EC2 instance must have an IAM instance profile attached with the necessary permissions for Terraform operations. Static AWS access keys are no longer required.
+
 * `AWS_SSH_KEY_PAIR` - SSH key name. It will be using for SSH connect to Red5 Pro nodes. Follow the [docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html) to create SSH key pair in AWS.
 * `AWS_ENABLE_ROOT_VOLUME_BLOCK_ENCRYPTION` - Enable or disable root block volume encryption for node instance. Defaults to true.
 
@@ -139,11 +150,153 @@ KAFKA_UI_VERSION=latest
 KAFKA_HOST=10.0.0.1
 TRAEFIK_HOST=1.2.3.4
 R5P_LICENSE_KEY=1111-2222-3333-4444
-AWS_ACCESS_KEY_ID=ABC123EXAMPLEKEY
-AWS_SECRET_ACCESS_KEY=DEF456EXAMPLESECRETKEY
 AWS_SSH_KEY_PAIR=example-ssh-key-name
 AWS_ENABLE_ROOT_VOLUME_BLOCK_ENCRYPTION=true
 ```
+
+#### Manual IAM Setup for Stream Manager Instance
+
+Since Stream Manager instances are deployed manually (not using the Terraform module), you need to manually create the IAM role, policy, and instance profile before deploying. The Stream Manager instance requires an IAM instance profile with appropriate permissions to run Terraform operations for managing EC2 instances. Here's how to set it up:
+
+**1. Create IAM Trust Policy** (save as `trust-policy.json`):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      }
+    }
+  ]
+}
+```
+
+**2. Create IAM Role** (replace `<role-name>` with your desired role name, e.g., `stream-manager-terraform-role`):
+
+```bash
+aws iam create-role \
+  --role-name <role-name> \
+  --assume-role-policy-document file://trust-policy.json \
+  --tags Key=Name,Value=<role-name>
+```
+
+**3. Create IAM Policy** (save as `terraform-policy.json`):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sts:GetCallerIdentity",
+        "ec2:RunInstances",
+        "ec2:TerminateInstances",
+        "ec2:StartInstances",
+        "ec2:StopInstances",
+        "ec2:RebootInstances",
+        "ec2:ModifyInstanceAttribute",
+        "ec2:DescribeInstances",
+        "ec2:DescribeImages",
+        "ec2:DescribeInstanceTypes",
+        "ec2:DescribeInstanceStatus",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeVpcs",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeKeyPairs",
+        "ec2:DescribeInstanceAttribute",
+        "ec2:DescribeVpcAttribute",
+        "ec2:DescribeInstanceTypeOfferings",
+        "ec2:DescribeInstanceCreditSpecifications",
+        "ec2:DescribeRegions",
+        "ec2:DescribeAccountAttributes",
+        "ec2:CreateTags",
+        "ec2:DeleteTags",
+        "ec2:DescribeTags",
+        "ec2:DescribeVolumes",
+        "ec2:AttachVolume",
+        "ec2:DetachVolume",
+        "ec2:CreateVolume",
+        "ec2:DeleteVolume",
+        "ec2:ModifyVolume",
+        "ec2:DescribeSnapshots",
+        "ec2:CreateSnapshot",
+        "ec2:DeleteSnapshot",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:CreateNetworkInterface",
+        "ec2:DeleteNetworkInterface",
+        "ec2:AttachNetworkInterface",
+        "ec2:DetachNetworkInterface",
+        "ec2:ModifyNetworkInterfaceAttribute",
+        "ec2:DescribePlacementGroups",
+        "ec2:CreatePlacementGroup",
+        "ec2:DeletePlacementGroup",
+        "ec2:DescribeSpotInstanceRequests",
+        "ec2:RequestSpotInstances",
+        "ec2:CancelSpotInstanceRequests",
+        "ec2:DescribeSpotPriceHistory",
+        "ec2:DescribeReservedInstances",
+        "ec2:DescribeReservedInstancesOfferings"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+**4. Create and Attach IAM Policy** (replace `<policy-name>` with your desired policy name, e.g., `stream-manager-terraform-policy`):
+
+```bash
+aws iam create-policy \
+  --policy-name <policy-name> \
+  --policy-document file://terraform-policy.json \
+  --tags Key=Name,Value=<policy-name>
+
+# Get the policy ARN from the output, then attach it to the role
+aws iam attach-role-policy \
+  --role-name <role-name> \
+  --policy-arn arn:aws:iam::<account-id>:policy/<policy-name>
+```
+
+**5. Create IAM Instance Profile** (replace `<profile-name>` with your desired profile name, e.g., `stream-manager-terraform-profile`):
+
+```bash
+aws iam create-instance-profile \
+  --instance-profile-name <profile-name> \
+  --tags Key=Name,Value=<profile-name>
+
+aws iam add-role-to-instance-profile \
+  --instance-profile-name <profile-name> \
+  --role-name <role-name>
+```
+
+**6. Attach Instance Profile to EC2 Instance**:
+
+```bash
+# Stop the instance first (if running)
+aws ec2 stop-instances --instance-ids <instance-id>
+
+# Wait for instance to stop, then modify instance attribute
+aws ec2 modify-instance-attribute \
+  --instance-id <instance-id> \
+  --iam-instance-profile Name=<profile-name>
+
+# Start the instance
+aws ec2 start-instances --instance-ids <instance-id>
+```
+
+Alternatively, you can attach the instance profile via AWS Console:
+1. Go to EC2 → Instances
+2. Select your Stream Manager instance
+3. Actions → Security → Modify IAM role
+4. Select your instance profile and save
+
+**Note:** After creating the instance profile, it may take a few seconds to propagate. Wait a moment before attaching it to the instance.
 
 ### Linode specific variables
 

@@ -13,3 +13,7 @@ This repository contains Docker Compose configuration examples for deploying Red
 We strongly recommend using the official [Red5 Pro Terraform modules](https://registry.terraform.io/modules/red5pro) for automated infrastructure deployment. These modules handle IAM roles, security groups, and all required infrastructure automatically.
 
 If you need to deploy manually, these Docker Compose examples provide complete configurations for running Stream Manager 2.0 with all required microservices.
+
+## Relevant Links
+
+[Stream Manager 2.0](https://www.red5.net/docs/red5-pro/development/api/stream-manager-2-0/examples/) Examples contains NodeGroupConfig examples, which are JSON templates used to define different cluster topologies and Node Group configurations for Stream Manager 2.0

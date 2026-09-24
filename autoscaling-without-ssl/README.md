@@ -41,6 +41,25 @@ mkdir -p /usr/local/stream-manager
 
 3. Copy the files from this folder into the newly created `/usr/local/stream-manager` directory.
 
+## Generate the AS-Admin Secrets Encryption Key
+
+Stream Manager 2.0's `as-admin`, `as-streams`, `as-proxy`, and `as-terraform` services encrypt secrets (for example, auto-generated cluster passwords) at rest using a shared AES key. This key must exist before you start the stack - the services fail to start without it.
+
+1. Create the `keys` directory next to your `docker-compose.yml` (if it doesn't already exist):
+
+```bash
+mkdir -p /usr/local/stream-manager/keys
+```
+
+2. Generate the key and place it in that directory:
+
+```bash
+openssl rand -base64 32 > /usr/local/stream-manager/keys/r5as-secrets.key
+chmod 400 /usr/local/stream-manager/keys/r5as-secrets.key
+```
+
+> **Deploying more than one Stream Manager instance sharing the same Kafka cluster?** Generate the key once and copy the exact same `r5as-secrets.key` file to every instance. All instances must use an identical key, since they share one Kafka-backed secret store.
+
 ## Main Configuration Variables
 
 To deploy the application, you need to configure the environment variables. The main example variables are provided in the file named `.example.env.`  

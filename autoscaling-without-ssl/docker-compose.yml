@@ -141,6 +141,7 @@ services:
     deploy:
       replicas: 1
     environment:
+      R5AS_SECRETS_KEY_FILE: ${R5AS_SECRETS_KEY_FILE:-/run/secrets/r5as-secrets.key}
       R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_AUTOSCALE_PARTITIONS: ${R5AS_AUTOSCALE_PARTITIONS:-1}
       R5AS_REPLICATION_FACTOR: ${R5AS_REPLICATION_FACTOR:-1}
@@ -176,6 +177,8 @@ services:
       R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT: ${R5AS_GLOBAL_CONSUMER_FETCH_MAX_WAIT_TIMEOUT:-1000}
       R5AS_PRODUCER_REQUEST_TIMEOUT: ${R5AS_PRODUCER_REQUEST_TIMEOUT:-300000}
       R5AS_GROUP_INSTANCE_ID: ${R5AS_GROUP_INSTANCE_ID:-1}
+    volumes:
+      - ./keys/r5as-secrets.key:/run/secrets/r5as-secrets.key:ro
     logging:
       driver: "json-file"
       options:
@@ -207,6 +210,7 @@ services:
       as-kafka-init:
         condition: service_healthy
     environment:
+      R5AS_SECRETS_KEY_FILE: ${R5AS_SECRETS_KEY_FILE:-/run/secrets/r5as-secrets.key}
       R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_AUTOSCALE_PARTITIONS: ${R5AS_AUTOSCALE_PARTITIONS:-1}
       R5AS_REPLICATION_FACTOR: ${R5AS_REPLICATION_FACTOR:-1}
@@ -248,6 +252,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./keys/oracle_private_api_key.pem:/home/ubuntu/.ssh/oracle_private_api_key.pem
       - ./keys/red5pro_ssh_public_key.pub:/home/ubuntu/.ssh/red5pro_ssh_public_key.pub
+      - ./keys/r5as-secrets.key:/run/secrets/r5as-secrets.key:ro
     logging:
       driver: "json-file"
       options:
@@ -263,6 +268,7 @@ services:
     ports:
       - 9080:8080
     environment:
+      R5AS_SECRETS_KEY_FILE: ${R5AS_SECRETS_KEY_FILE:-/run/secrets/r5as-secrets.key}
       R5AS_REPLICATION_FACTOR: ${R5AS_REPLICATION_FACTOR:-1}
       R5AS_STATE_DIRECTORY: /root/kafka-streams
       R5AS_BOOTSTRAP_SERVERS: kafka0:29092
@@ -279,6 +285,8 @@ services:
       # R5AS_AUTOSCALE_DOMAIN: ${TRAEFIK_HOST:-localhost}
       R5AS_PROXY_HTTP_REQUEST_TIMEOUT_S: ${R5AS_PROXY_HTTP_REQUEST_TIMEOUT_S:-60}
       R5AS_GROUP_INSTANCE_ID: ${R5AS_GROUP_INSTANCE_ID:-1}
+    volumes:
+      - ./keys/r5as-secrets.key:/run/secrets/r5as-secrets.key:ro
     logging:
       driver: "json-file"
       options:
@@ -437,6 +445,7 @@ services:
       retries: 18  # 3 mins
       start_period: 300s  # grace period, not minimum
     environment:
+      R5AS_SECRETS_KEY_FILE: ${R5AS_SECRETS_KEY_FILE:-/run/secrets/r5as-secrets.key}
       R5AS_AUTH_SECRET: ${R5AS_AUTH_SECRET:?R5AS_AUTH_SECRET is not set}
       R5AS_AUTH_JWT_TTL_MINUTES: ${R5AS_AUTH_JWT_TTL_MINUTES:-800}
       R5AS_STATE_DIRECTORY: /root/kafka-streams
@@ -472,6 +481,8 @@ services:
       R5AS_PRODUCER_LINGER_MS: ${R5AS_PRODUCER_LINGER_MS:-50}
       R5AS_PRODUCER_TRANSACTION_TIMEOUT: ${R5AS_PRODUCER_TRANSACTION_TIMEOUT:-900000}
       R5AS_GROUP_INSTANCE_ID: ${R5AS_GROUP_INSTANCE_ID:-1}
+    volumes:
+      - ./keys/r5as-secrets.key:/run/secrets/r5as-secrets.key:ro
     logging:
       driver: "json-file"
       options:

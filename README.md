@@ -17,3 +17,7 @@ If you need to deploy manually, these Docker Compose examples provide complete c
 ## Relevant Links
 
 [Stream Manager 2.0](https://www.red5.net/docs/red5-pro/development/api/stream-manager-2-0/examples/) Examples contains NodeGroupConfig examples, which are JSON templates used to define different cluster topologies and Node Group configurations for Stream Manager 2.0
+
+## Red5 AI Skills
+
+Use the **Red5 AI skills** to help your AI coding assistant build real-time video applications with Red5 Pro and Red5 Cloud, with guidance grounded in Red5 documentation. [Download the skill from GitHub](https://github.com/red5pro/red5pro-skills) or install it by running `npx red5pro-skills` in your terminal.
